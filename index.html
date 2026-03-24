@@ -3,290 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self' https://e-publishing.af.mil https://static.e-publishing.af.mil https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;">
     <title>AFSC CFETP Download Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
+
         :root {
-            --primary: #1a3a5c;
-            --primary-light: #2a5a8c;
-            --accent: #f0b400;
-            --bg-dark: #0d1b2a;
-            --bg-card: #1b2838;
-            --text: #e0e6ed;
-            --text-muted: #8899aa;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --border: #2a3f55;
+            --primary: #0a1628;
+            --primary-mid: #0f2035;
+            --primary-light: #162d4a;
+            --accent: #00e5ff;
+            --accent-dim: #007a8a;
+            --accent-glow: rgba(0,229,255,0.15);
+            --gold: #f0b400;
+            --green: #00e676;
+            --red: #ff3d3d;
+            --orange: #ff9100;
+            --blue: #448aff;
+            --text: #c8d6e5;
+            --text-bright: #e8f0fe;
+            --text-muted: #5a7a9a;
+            --border: #1a3050;
+            --border-light: #254060;
+            --card: #0d1f33;
+            --card-hover: #112840;
+            --success: #00e676;
+            --danger: #ff3d3d;
+            --warning: #ff9100;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Rajdhani', 'Segoe UI', sans-serif;
+            background: var(--primary);
             color: var(--text);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* ── Tactical Background Grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Header ── */
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--bg-dark) 100%);
-            border-bottom: 3px solid var(--accent);
-            padding: 20px 0;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f33 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 30px 20px 25px;
             text-align: center;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
-            letter-spacing: 2px;
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            box-shadow: 0 0 20px var(--accent), 0 0 60px rgba(0,229,255,0.3);
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: rgba(0,229,255,0.1);
+            border: 1px solid var(--accent-dim);
+            border-radius: 4px;
+            padding: 4px 14px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem;
             color: var(--accent);
-            margin-bottom: 5px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 2.2rem;
+            color: var(--accent);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(0,229,255,0.4);
+            margin-bottom: 8px;
         }
 
         .header p {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 1px;
         }
 
         .container {
-            max-width: 1100px;
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 25px 20px;
         }
 
-        /* Search Section */
-        .search-section {
-            background: var(--bg-card);
+        /* ── Legend Bar ── */
+        .legend-bar {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            padding: 14px 20px;
+            background: var(--card);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            align-items: center;
         }
 
-        .search-section h2 {
-            font-size: 1rem;
-            color: var(--accent);
-            margin-bottom: 15px;
+        .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
+        .legend-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* ── Section Panels ── */
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20px; right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+        }
+
+        .panel-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i { font-size: 0.9rem; }
+
+        /* ── Search Bar ── */
         .search-row {
             display: flex;
             gap: 10px;
             align-items: stretch;
         }
 
-        .search-input-wrap {
+        .search-wrap {
             flex: 1;
             position: relative;
         }
 
-        .search-input-wrap input {
+        .search-wrap input {
             width: 100%;
-            padding: 12px 15px 12px 42px;
-            background: var(--bg-dark);
+            padding: 14px 18px 14px 44px;
+            background: var(--primary);
             border: 1px solid var(--border);
             border-radius: 8px;
-            color: var(--text);
+            color: var(--text-bright);
+            font-family: 'Share Tech Mono', monospace;
             font-size: 1rem;
+            letter-spacing: 1px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
             text-transform: uppercase;
         }
 
-        .search-input-wrap input:focus {
+        .search-wrap input:focus {
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 20px rgba(0,229,255,0.05);
         }
 
-        .search-input-wrap .input-icon {
+        .search-wrap input::placeholder {
+            color: var(--text-muted);
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .search-wrap .search-icon {
             position: absolute;
-            left: 14px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--accent-dim);
+            font-size: 0.9rem;
         }
 
+        /* ── Buttons ── */
         .btn {
-            padding: 12px 22px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             text-decoration: none;
+            white-space: nowrap;
         }
 
-        .btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.2); }
         .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
-        .btn-primary { background: var(--primary-light); color: #fff; }
-        .btn-epubs { background: #1a5276; color: #fff; }
-        .btn-success { background: var(--success); color: #fff; }
-        .btn-warning { background: var(--warning); color: #000; }
-        .btn-info { background: var(--info); color: #fff; }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-sm { padding: 8px 14px; font-size: 0.82rem; }
+        .btn-accent { background: var(--accent); color: #000; }
+        .btn-accent:hover { box-shadow: 0 0 20px rgba(0,229,255,0.4); }
+        .btn-epubs { background: var(--primary-light); color: var(--accent); border: 1px solid var(--accent-dim); }
+        .btn-pdf { background: var(--red); color: #fff; }
+        .btn-rtf { background: var(--orange); color: #000; }
+        .btn-html { background: var(--blue); color: #fff; }
+        .btn-search { background: var(--accent-dim); color: #fff; }
+        .btn-green { background: var(--green); color: #000; }
+        .btn-danger { background: var(--red); color: #fff; }
+        .btn-sm { padding: 8px 14px; font-size: 0.78rem; }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* AFSC Grid */
-        .afsc-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+        /* ── Filter Tabs ── */
+        .filter-row {
+            display: flex;
             gap: 8px;
-            margin-top: 15px;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
-        .afsc-chip {
-            background: var(--bg-dark);
+        .filter-btn {
+            padding: 8px 16px;
             border: 1px solid var(--border);
             border-radius: 6px;
-            padding: 8px 6px;
-            text-align: center;
-            font-size: 0.82rem;
+            background: var(--primary);
+            color: var(--text-muted);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            color: var(--text);
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .afsc-chip:hover {
+        .filter-btn:hover { border-color: var(--accent-dim); color: var(--text); }
+        .filter-btn.active {
+            background: var(--accent);
+            color: #000;
             border-color: var(--accent);
-            background: var(--primary);
-            color: var(--accent);
         }
 
-        /* Results */
-        .results-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: none;
-        }
-
-        .results-section.active { display: block; }
-
-        .result-header {
+        /* ── Stats Bar ── */
+        .stats-bar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            gap: 20px;
             flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .result-header h2 {
-            font-size: 1.1rem;
-            color: var(--accent);
-        }
-
-        .result-card {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 18px;
-            margin-bottom: 12px;
-        }
-
-        .result-card .title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-
-        .result-card .product-num {
-            font-size: 0.85rem;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .result-card .meta {
+            padding: 10px 0;
+            font-family: 'Share Tech Mono', monospace;
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 12px;
         }
 
-        .result-actions {
+        .stats-bar span { color: var(--text-muted); }
+        .stats-bar strong { color: var(--accent); font-weight: 600; }
+
+        /* ── AFSC Table ── */
+        .afsc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .afsc-table thead th {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .afsc-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .afsc-table tbody tr:hover {
+            background: var(--card-hover);
+        }
+
+        .afsc-table tbody td {
+            padding: 14px 15px;
+            vertical-align: middle;
+        }
+
+        .afsc-code {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-bright);
+            letter-spacing: 1px;
+        }
+
+        .afsc-title {
+            font-size: 0.92rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .afsc-group {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .type-badge.enl { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+        .type-badge.ofr { background: rgba(68,138,255,0.15); color: var(--blue); border: 1px solid rgba(68,138,255,0.3); }
+
+        .actions-cell {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
-        /* Upload Section */
-        .upload-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            display: none;
-        }
-
-        .upload-section.active { display: block; }
-
-        .upload-section h2 {
-            font-size: 1rem;
-            color: var(--accent);
-            margin-bottom: 8px;
+        /* ── Convert All Bar ── */
+        .convert-bar {
             display: flex;
+            gap: 10px;
             align-items: center;
-            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .upload-section > p {
+        .convert-bar .convert-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            line-height: 1.5;
+            letter-spacing: 1px;
         }
 
+        /* ── Upload Section ── */
         .upload-area {
             border: 2px dashed var(--border);
             border-radius: 10px;
-            padding: 30px;
+            padding: 35px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: var(--bg-dark);
+            background: var(--primary);
         }
 
         .upload-area:hover {
-            border-color: var(--accent);
-            background: rgba(240, 180, 0, 0.05);
+            border-color: var(--accent-dim);
+            background: rgba(0,229,255,0.03);
         }
 
         .upload-area.dragover {
             border-color: var(--accent);
-            background: rgba(240, 180, 0, 0.1);
+            background: rgba(0,229,255,0.08);
+            box-shadow: inset 0 0 30px rgba(0,229,255,0.05);
         }
 
-        .upload-area i {
-            font-size: 2rem;
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        .upload-area p {
-            color: var(--text-muted);
-            margin-bottom: 0;
-        }
+        .upload-area i { font-size: 2.2rem; color: var(--accent-dim); margin-bottom: 12px; }
+        .upload-area p { color: var(--text-muted); font-size: 0.85rem; }
+        .upload-area .upload-main { font-size: 1rem; color: var(--text); font-weight: 600; margin-bottom: 4px; }
 
         .upload-actions {
             display: flex;
@@ -296,51 +428,48 @@
             align-items: center;
         }
 
-        #fileInput {
-            display: none;
-        }
+        #fileInput { display: none; }
 
-        /* Status / Log */
-        .status-bar {
-            background: var(--bg-card);
+        .step-list {
+            background: var(--primary);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 25px;
-            display: none;
+            border-radius: 8px;
+            padding: 15px 15px 15px 20px;
+            margin-bottom: 15px;
         }
 
-        .status-bar.active { display: block; }
-
-        .status-bar h3 {
-            font-size: 0.9rem;
-            color: var(--accent);
-            margin-bottom: 10px;
+        .step-list ol {
+            padding-left: 18px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 2;
         }
 
+        .step-list ol li strong { color: var(--accent); }
+
+        /* ── Activity Log ── */
         .log-area {
-            background: var(--bg-dark);
+            background: var(--primary);
             border: 1px solid var(--border);
             border-radius: 6px;
             padding: 12px;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            line-height: 1.6;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem;
+            line-height: 1.7;
         }
 
-        .log-entry { margin-bottom: 2px; }
-        .log-entry.info { color: var(--info); }
-        .log-entry.success { color: var(--success); }
-        .log-entry.error { color: var(--danger); }
-        .log-entry.warn { color: var(--warning); }
+        .log-entry { margin-bottom: 1px; }
+        .log-entry.info { color: var(--accent); }
+        .log-entry.success { color: var(--green); }
+        .log-entry.error { color: var(--red); }
+        .log-entry.warn { color: var(--orange); }
 
-        /* Progress */
         .progress-wrap {
-            background: var(--bg-dark);
+            background: var(--primary);
             border-radius: 6px;
-            height: 8px;
+            height: 6px;
             margin-top: 10px;
             overflow: hidden;
             display: none;
@@ -350,74 +479,19 @@
 
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--success));
+            background: linear-gradient(90deg, var(--accent), var(--green));
             border-radius: 6px;
             width: 0%;
             transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(0,229,255,0.5);
         }
 
-        /* Legend */
-        .legend {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 12px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-        }
-
-        .legend-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: #fff;
-            font-weight: 700;
-        }
-
-        /* Step Instructions */
-        .step-instructions {
-            background: var(--bg-dark);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .step-instructions ol {
-            padding-left: 20px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            line-height: 1.8;
-        }
-
-        .step-instructions ol li {
-            margin-bottom: 4px;
-        }
-
-        .step-instructions ol li strong {
-            color: var(--accent);
-        }
-
-        /* Modal */
+        /* ── Modal ── */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -426,156 +500,165 @@
         .modal-overlay.active { display: flex; }
 
         .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: var(--card);
+            border: 1px solid var(--accent-dim);
             border-radius: 12px;
             padding: 30px;
-            max-width: 520px;
+            max-width: 480px;
             width: 90%;
             text-align: center;
+            box-shadow: 0 0 60px rgba(0,229,255,0.1);
         }
 
-        .modal h3 { color: var(--accent); margin-bottom: 15px; }
+        .modal h3 {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--accent);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
         .modal p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; }
         .modal .btn { margin: 0 5px; }
 
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .hidden { display: none !important; }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .epubs-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--info);
-            text-decoration: none;
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .epubs-link:hover { text-decoration: underline; }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .badge-found { background: var(--success); color: #fff; }
-
-        @media (max-width: 600px) {
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
             .search-row { flex-direction: column; }
-            .afsc-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
-            .result-actions { flex-direction: column; }
-            .upload-actions { flex-direction: column; }
-            .legend { flex-direction: column; gap: 8px; }
+            .filter-row { justify-content: center; }
+            .afsc-table thead { display: none; }
+            .afsc-table tbody tr {
+                display: block;
+                padding: 15px;
+                margin-bottom: 8px;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+            }
+            .afsc-table tbody td {
+                display: block;
+                padding: 4px 0;
+                text-align: left;
+            }
+            .afsc-table tbody td:first-child { padding-top: 0; }
+            .actions-cell { margin-top: 8px; }
+            .legend-bar { gap: 12px; }
+            .stats-bar { gap: 10px; font-size: 0.72rem; }
         }
     </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- HEADER                                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="header">
-    <h1><i class="fas fa-jet-fighter"></i> AFSC CFETP DOWNLOAD HUB</h1>
-    <p>All Air Force Specialty Codes • Search e-Publishing • Download as PDF, RTF, or HTML</p>
+    <div class="header-badge">Department of the Air Force</div>
+    <h1><i class="fas fa-jet-fighter"></i> AFSC CFETP Download Hub</h1>
+    <p>All Air Force Specialty Codes • Download as PDF • Convert to RTF or HTML</p>
 </div>
 
 <div class="container">
 
     <!-- Legend -->
-    <div class="legend">
+    <div class="legend-bar">
         <div class="legend-item">
-            <div class="legend-icon" style="background:var(--danger);"><i class="fas fa-file-pdf"></i></div>
-            PDF — Direct PDF download
+            <span class="legend-icon" style="background:var(--red);color:#fff;">PDF</span>
+            Direct PDF download
         </div>
         <div class="legend-item">
-            <div class="legend-icon" style="background:var(--warning); color:#000;"><i class="fas fa-file-word"></i></div>
-            RTF — Convert PDF → Rich Text File
+            <span class="legend-icon" style="background:var(--orange);color:#000;">RTF</span>
+            Convert to Rich Text
         </div>
         <div class="legend-item">
-            <div class="legend-icon" style="background:var(--info);"><i class="fas fa-file-code"></i></div>
-            HTML — Convert PDF → HTML file
+            <span class="legend-icon" style="background:var(--blue);color:#fff;">HTML</span>
+            Convert to HTML file
         </div>
         <div class="legend-item">
-            <div class="legend-icon" style="background:var(--primary-light);"><i class="fas fa-search"></i></div>
-            e-Pubs — Search on e-Publishing
+            <span class="legend-icon" style="background:var(--accent-dim);color:#fff;">SEARCH</span>
+            e-Publishing fallback
         </div>
     </div>
 
-    <!-- Search Section -->
-    <div class="search-section">
-        <h2><i class="fas fa-search"></i> Search AFSC CFETP</h2>
-        <div class="search-row">
-            <div class="search-input-wrap">
-                <i class="fas fa-tag input-icon"></i>
-                <input type="text" id="afscInput" placeholder="Enter AFSC (e.g. 1C5X1, 3D0X2, 1N0X1)..." maxlength="10"
-                    pattern="[A-Za-z0-9]+" title="Alphanumeric AFSC codes only">
+    <!-- ── Search & Filter Panel ── -->
+    <div class="panel">
+        <div class="panel-title"><i class="fas fa-radar"></i> Search & Filter</div>
+        <div class="search-row" style="margin-bottom:15px;">
+            <div class="search-wrap">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput"
+                    placeholder="Search AFSC, title, or career group..."
+                    maxlength="40">
             </div>
-            <button class="btn btn-primary" id="searchBtn" onclick="searchAFSC()">
-                <i class="fas fa-search"></i> Search
-            </button>
-            <button class="btn btn-epubs" onclick="openEpubsSearch()">
+            <button class="btn btn-epubs" onclick="openEpubsFromInput()" title="Open e-Publishing with this AFSC">
                 <i class="fas fa-external-link-alt"></i> e-Pubs
             </button>
         </div>
-
-        <div class="afsc-grid" id="afscGrid"></div>
+        <div class="filter-row">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">ALL</button>
+            <button class="filter-btn" data-filter="enlisted" onclick="setFilter('enlisted',this)">ENLISTED</button>
+            <button class="filter-btn" data-filter="officer" onclick="setFilter('officer',this)">OFFICER</button>
+            <button class="filter-btn" data-filter="direct" onclick="setFilter('direct',this)">DIRECT PDF ONLY</button>
+        </div>
     </div>
 
-    <!-- Status Bar -->
-    <div class="status-bar" id="statusBar">
-        <h3><i class="fas fa-terminal"></i> Activity Log</h3>
+    <!-- ── Stats ── -->
+    <div class="stats-bar" id="statsBar">
+        <span>Showing <strong id="statShowing">0</strong></span>
+        <span>Enlisted: <strong id="statEnlisted">0</strong></span>
+        <span>Officer: <strong id="statOfficer">0</strong></span>
+        <span>Direct PDF: <strong id="statDirect">0</strong></span>
+        <span>Search Only: <strong id="statSearch">0</strong></span>
+    </div>
+
+    <!-- ── AFSC Table ── -->
+    <div class="panel" style="padding:0;overflow:hidden;">
+        <table class="afsc-table">
+            <thead>
+                <tr>
+                    <th style="width:140px;">AFSC</th>
+                    <th>Title</th>
+                    <th style="width:150px;">Group</th>
+                    <th style="width:280px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="afscTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- ── Activity Log ── -->
+    <div class="panel hidden" id="logPanel">
+        <div class="panel-title"><i class="fas fa-terminal"></i> Activity Log</div>
         <div class="log-area" id="logArea"></div>
         <div class="progress-wrap" id="progressWrap">
             <div class="progress-bar" id="progressBar"></div>
         </div>
     </div>
 
-    <!-- Results Section -->
-    <div class="results-section" id="resultsSection">
-        <div class="result-header">
-            <h2 id="resultTitle"><i class="fas fa-file-alt"></i> Results</h2>
-            <span id="resultBadge"></span>
-        </div>
-        <div id="resultsContainer"></div>
-    </div>
-
-    <!-- Upload / Convert Section -->
-    <div class="upload-section" id="uploadSection">
-        <h2><i class="fas fa-exchange-alt"></i> Convert Downloaded PDF to RTF or HTML</h2>
-        <p>Due to browser security (CORS), the PDF must be downloaded first, then uploaded here for conversion. This all happens locally in your browser — no data is sent anywhere.</p>
-
-        <div class="step-instructions">
+    <!-- ── Upload / Convert Panel ── -->
+    <div class="panel hidden" id="uploadPanel">
+        <div class="panel-title"><i class="fas fa-exchange-alt"></i> Convert PDF to RTF or HTML</div>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">
+            Browser security (CORS) prevents direct conversion. Download the PDF first, then upload it here.
+        </p>
+        <div class="step-list">
             <ol>
-                <li>Click the <strong>PDF</strong> button above to download the CFETP PDF file</li>
-                <li>Once downloaded, <strong>drag & drop</strong> the PDF below (or click to browse)</li>
-                <li>Choose <strong>Convert to RTF</strong> or <strong>Convert to HTML</strong></li>
+                <li>Click <strong>PDF</strong> to download the CFETP</li>
+                <li><strong>Drag & drop</strong> the PDF below or click to browse</li>
+                <li>Click <strong>Convert to RTF</strong> or <strong>Convert to HTML</strong></li>
             </ol>
         </div>
-
         <div class="upload-area" id="uploadArea">
             <i class="fas fa-cloud-upload-alt"></i>
-            <p><strong>Drop PDF here</strong> or click to browse</p>
-            <p style="font-size:0.75rem; margin-top:8px;">Accepts .pdf files only</p>
+            <p class="upload-main">Drop PDF here or click to browse</p>
+            <p style="font-size:0.75rem;margin-top:6px;">Accepts .pdf files only • Max 100MB</p>
         </div>
         <input type="file" id="fileInput" accept=".pdf,application/pdf">
-
-        <div class="upload-actions" id="uploadActions" style="display:none;">
-            <span id="uploadedFileName" style="color:var(--accent); font-weight:600; font-size:0.9rem; display:flex; align-items:center; gap:6px;"></span>
-            <button class="btn btn-warning btn-sm" onclick="convertUploadedFile('rtf')">
+        <div class="upload-actions hidden" id="uploadActions">
+            <span id="uploadedFileName" style="color:var(--accent);font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;"></span>
+            <button class="btn btn-rtf btn-sm" onclick="convertUploadedFile('rtf')">
                 <i class="fas fa-file-word"></i> Convert to RTF
             </button>
-            <button class="btn btn-info btn-sm" onclick="convertUploadedFile('html')">
+            <button class="btn btn-html btn-sm" onclick="convertUploadedFile('html')">
                 <i class="fas fa-file-code"></i> Convert to HTML
             </button>
             <button class="btn btn-danger btn-sm" onclick="clearUpload()">
@@ -586,743 +669,776 @@
 
 </div>
 
-<!-- Confirmation Modal -->
+<!-- ── Modal ── -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal">
-        <h3 id="modalTitle"><i class="fas fa-info-circle"></i> Convert Document</h3>
+        <h3><i class="fas fa-download"></i> CONVERT</h3>
         <p id="modalMsg"></p>
-        <div id="modalButtons">
-            <button class="btn btn-success" id="modalConfirm">OK</button>
-            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
-        </div>
+        <button class="btn btn-accent" id="modalConfirm">Download PDF First</button>
+        <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
     </div>
 </div>
 
 <script>
-    // ─── Configure PDF.js worker ───
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// ═══════════════════════════════════════════════════════════════════════════════
+// PDF.js Worker
+// ═══════════════════════════════════════════════════════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // ─── AFSC Master List ───
-    var AFSC_LIST = [
-        "1A0X1","1A1X1","1A2X1","1A3X1","1A8X1","1A8X2","1A9X1",
-        "1B4X1","1C0X2","1C1X1","1C2X1","1C3X1","1C4X1","1C5X1",
-        "1C6X1","1C7X1","1C8X1","1D7X1","1N0X1","1N1X1","1N2X1",
-        "1N3X1","1N4X1","1N7X1","1N8X1","1P0X1","1S0X1","1T0X1",
-        "1T2X1","1U0X1","1W0X1","1W0X2","1Z1X1",
-        "2A0X1","2A2X1","2A2X2","2A2X3","2A3X3","2A3X4","2A3X5",
-        "2A3X7","2A3X8","2A5X1","2A5X2","2A5X3","2A5X4","2A6X1",
-        "2A6X2","2A6X3","2A6X4","2A6X5","2A6X6","2A7X1","2A7X2",
-        "2A7X3","2A7X5","2A8X1","2A8X2","2A9X1","2A9X2","2A9X3",
-        "2F0X1","2G0X1","2M0X1","2M0X2","2M0X3","2P0X1","2R0X1",
-        "2R1X1","2S0X1","2T0X1","2T1X1","2T2X1","2T3X1","2T3X2",
-        "2W0X1","2W1X1","2W2X1",
-        "3D0X1","3D0X2","3D0X3","3D0X4","3D1X1","3D1X2","3D1X3",
-        "3D1X4","3D1X7","3E0X1","3E0X2","3E1X1","3E2X1","3E3X1",
-        "3E4X1","3E4X3","3E5X1","3E6X1","3E7X1","3E8X1","3E9X1",
-        "3F0X1","3F1X1","3F2X1","3F3X1","3F4X1","3F5X1","3H0X1",
-        "3M0X1","3N0X1","3N0X2","3N0X5","3N1X1","3N2X1","3P0X1",
-        "3S0X1","3S1X1","3S2X1","3S3X1",
-        "4A0X1","4A1X1","4A2X1","4B0X1","4C0X1","4D0X1","4E0X1",
-        "4H0X1","4J0X2","4M0X1","4N0X1","4N1X1","4P0X1","4R0X1",
-        "4T0X1","4T0X2","4V0X1","4Y0X1","4Y0X2",
-        "5C0X1","5J0X1","5R0X1",
-        "6C0X1","6F0X1",
-        "7S0X1","8A1X1","8B0X1","8B1X1","8C0X0","8D0X0","8G0X0",
-        "8J0X0","8M0X0","8P0X0","8R0X0","8S0X0","8T0X0","9A0X0",
-        "9E0X0","9G1X1","9J0X0","9L0X0","9P0X0","9R0X0","9S1X0",
-        "9T0X0","9U0X0"
-    ];
+// ═══════════════════════════════════════════════════════════════════════════════
+// AFSC Master Data — Enlisted + Officer with titles and groups
+// ═══════════════════════════════════════════════════════════════════════════════
+var AFSC_DATA = [
+    // ── Operations ──
+    {afsc:"10C0",title:"Operations Commander",group:"Operations",type:"officer"},
+    {afsc:"11BX",title:"Bomber Pilot",group:"Operations",type:"officer"},
+    {afsc:"11FX",title:"Fighter Pilot",group:"Operations",type:"officer"},
+    {afsc:"11HX",title:"Helicopter Pilot",group:"Operations",type:"officer"},
+    {afsc:"11KX",title:"Trainer Pilot",group:"Operations",type:"officer"},
+    {afsc:"11MX",title:"Mobility Pilot",group:"Operations",type:"officer"},
+    {afsc:"11RX",title:"Reconnaissance/Surveillance Pilot",group:"Operations",type:"officer"},
+    {afsc:"11SX",title:"Special Operations Pilot",group:"Operations",type:"officer"},
+    {afsc:"11UX",title:"Remotely Piloted Aircraft Pilot",group:"Operations",type:"officer"},
+    {afsc:"12BX",title:"Bomber Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"12FX",title:"Fighter Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"12HX",title:"Helicopter Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"12KX",title:"Trainer Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"12MX",title:"Mobility Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"12RX",title:"Reconnaissance/Surveillance CSO",group:"Operations",type:"officer"},
+    {afsc:"12SX",title:"Special Operations CSO",group:"Operations",type:"officer"},
+    {afsc:"12UX",title:"RPA Combat Systems Officer",group:"Operations",type:"officer"},
+    {afsc:"13AX",title:"Astronaut",group:"Operations",type:"officer"},
+    {afsc:"13BX",title:"Air Battle Manager",group:"Operations",type:"officer"},
+    {afsc:"13DX",title:"Control and Recovery",group:"Operations",type:"officer"},
+    {afsc:"13LX",title:"Air Liaison Officer",group:"Operations",type:"officer"},
+    {afsc:"13MX",title:"Airfield Operations",group:"Operations",type:"officer"},
+    {afsc:"13NX",title:"Nuclear and Missile Operations",group:"Operations",type:"officer"},
+    {afsc:"13OX",title:"Space Operations",group:"Operations",type:"officer"},
+    {afsc:"13SX",title:"Space Operations",group:"Operations",type:"officer"},
+    {afsc:"14NX",title:"Intelligence",group:"Intelligence",type:"officer"},
+    {afsc:"15WX",title:"Weather",group:"Operations",type:"officer"},
+    {afsc:"16FX",title:"Regional Affairs Strategist",group:"Operations",type:"officer"},
+    {afsc:"16GX",title:"Operations Research Analyst",group:"Operations",type:"officer"},
+    {afsc:"16PX",title:"Political-Military Affairs Strategist",group:"Operations",type:"officer"},
+    {afsc:"16RX",title:"Planning & Programming",group:"Operations",type:"officer"},
+    {afsc:"17CX",title:"Cyberspace Operations Commander",group:"Cyber",type:"officer"},
+    {afsc:"17DX",title:"Cyberspace Operations",group:"Cyber",type:"officer"},
+    {afsc:"17SX",title:"Cyberspace Warfare Operations",group:"Cyber",type:"officer"},
+    // ── Enlisted Operations ──
+    {afsc:"1A0X1",title:"In-Flight Refueling",group:"Operations",type:"enlisted"},
+    {afsc:"1A1X1",title:"Flight Engineer",group:"Operations",type:"enlisted"},
+    {afsc:"1A2X1",title:"Aircraft Loadmaster",group:"Operations",type:"enlisted"},
+    {afsc:"1A3X1",title:"Airborne Mission Systems",group:"Operations",type:"enlisted"},
+    {afsc:"1A8X1",title:"Airborne Cryptologic Language Analyst",group:"Intelligence",type:"enlisted"},
+    {afsc:"1A8X2",title:"Airborne ISR Operator",group:"Intelligence",type:"enlisted"},
+    {afsc:"1A9X1",title:"Special Missions Aviation",group:"Operations",type:"enlisted"},
+    {afsc:"1B4X1",title:"Cyber Warfare Operations",group:"Cyber",type:"enlisted"},
+    {afsc:"1C0X2",title:"Aviation Resource Management",group:"Operations",type:"enlisted"},
+    {afsc:"1C1X1",title:"Air Traffic Control",group:"Operations",type:"enlisted"},
+    {afsc:"1C2X1",title:"Combat Control",group:"Special Warfare",type:"enlisted"},
+    {afsc:"1C3X1",title:"Command Post",group:"Operations",type:"enlisted"},
+    {afsc:"1C4X1",title:"Tactical Air Control Party",group:"Special Warfare",type:"enlisted"},
+    {afsc:"1C5X1",title:"Command & Control Battle Management Ops",group:"Operations",type:"enlisted"},
+    {afsc:"1C6X1",title:"Space Systems Operations",group:"Space",type:"enlisted"},
+    {afsc:"1C7X1",title:"Airfield Management",group:"Operations",type:"enlisted"},
+    {afsc:"1C8X1",title:"Ground Radar Systems",group:"Operations",type:"enlisted"},
+    {afsc:"1D7X1",title:"Cyber Defense Operations",group:"Cyber",type:"enlisted"},
+    {afsc:"1N0X1",title:"All Source Intelligence",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N1X1",title:"Geospatial Intelligence",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N2X1",title:"Signals Intelligence",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N3X1",title:"Cryptologic Language Analyst",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N4X1",title:"Fusion Analyst",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N7X1",title:"Human Intelligence",group:"Intelligence",type:"enlisted"},
+    {afsc:"1N8X1",title:"Targeting Analyst",group:"Intelligence",type:"enlisted"},
+    {afsc:"1P0X1",title:"Aircrew Flight Equipment",group:"Operations",type:"enlisted"},
+    {afsc:"1S0X1",title:"Safety",group:"Operations",type:"enlisted"},
+    {afsc:"1T0X1",title:"Survival Evasion Resistance Escape",group:"Special Warfare",type:"enlisted"},
+    {afsc:"1T2X1",title:"Pararescue",group:"Special Warfare",type:"enlisted"},
+    {afsc:"1U0X1",title:"RPA Sensor Operator",group:"Operations",type:"enlisted"},
+    {afsc:"1W0X1",title:"Weather",group:"Operations",type:"enlisted"},
+    {afsc:"1W0X2",title:"Special Operations Weather",group:"Special Warfare",type:"enlisted"},
+    {afsc:"1Z1X1",title:"Tactical Air Control Party Specialist",group:"Special Warfare",type:"enlisted"},
+    // ── Maintenance ──
+    {afsc:"2A0X1",title:"Avionics Test Station & Components",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A2X1",title:"F-16/F-22 Avionics",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A2X2",title:"F-16/F-22 Armament Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A2X3",title:"F-16/F-22 Crew Chief",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A3X3",title:"A-10/F-15 Avionics",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A3X4",title:"Fighter Aircraft Crew Chief",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A3X5",title:"A-10/F-15 Avionics Test Station",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A3X7",title:"A-10/F-15 Crew Chief",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A3X8",title:"Fighter Armament Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A5X1",title:"Airlift/Special Mission Aircraft Mx",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A5X2",title:"Helicopter Maintenance",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A5X3",title:"Mobility Air Forces Integrated Avionics",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A5X4",title:"Refuel/Bomber Aircraft Maintenance",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X1",title:"Aerospace Propulsion",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X2",title:"Aerospace Ground Equipment",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X3",title:"Aircrew Egress Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X4",title:"Aircraft Fuel Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X5",title:"Aircraft Hydraulic Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A6X6",title:"Aircraft Electrical & Environmental",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A7X1",title:"Aircraft Metals Technology",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A7X2",title:"Nondestructive Inspection",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A7X3",title:"Aircraft Structural Maintenance",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A7X5",title:"Low Observable Aircraft Structural Mx",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A8X1",title:"Mobility Air Forces Crew Chief",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A8X2",title:"Mobility Air Forces Avionics",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A9X1",title:"Bomber/Special Crew Chief",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A9X2",title:"Bomber/Special Avionics",group:"Maintenance",type:"enlisted"},
+    {afsc:"2A9X3",title:"Bomber/Special Armament Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2F0X1",title:"Fuels",group:"Logistics",type:"enlisted"},
+    {afsc:"2G0X1",title:"Logistics Plans",group:"Logistics",type:"enlisted"},
+    {afsc:"2M0X1",title:"Missile & Space Systems Electronic Mx",group:"Maintenance",type:"enlisted"},
+    {afsc:"2M0X2",title:"Missile & Space Systems Maintenance",group:"Maintenance",type:"enlisted"},
+    {afsc:"2M0X3",title:"Missile & Space Facilities",group:"Maintenance",type:"enlisted"},
+    {afsc:"2P0X1",title:"Precision Measurement Equipment Lab",group:"Maintenance",type:"enlisted"},
+    {afsc:"2R0X1",title:"Maintenance Management Analysis",group:"Maintenance",type:"enlisted"},
+    {afsc:"2R1X1",title:"Maintenance Management Production",group:"Maintenance",type:"enlisted"},
+    {afsc:"2S0X1",title:"Materiel Management",group:"Logistics",type:"enlisted"},
+    {afsc:"2T0X1",title:"Traffic Management",group:"Logistics",type:"enlisted"},
+    {afsc:"2T1X1",title:"Vehicle Operations",group:"Logistics",type:"enlisted"},
+    {afsc:"2T2X1",title:"Air Transportation",group:"Logistics",type:"enlisted"},
+    {afsc:"2T3X1",title:"Vehicle Maintenance",group:"Logistics",type:"enlisted"},
+    {afsc:"2T3X2",title:"Special Vehicle Maintenance",group:"Logistics",type:"enlisted"},
+    {afsc:"2W0X1",title:"Munitions Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2W1X1",title:"Aircraft Armament Systems",group:"Maintenance",type:"enlisted"},
+    {afsc:"2W2X1",title:"Nuclear Weapons",group:"Maintenance",type:"enlisted"},
+    // ── Cyber / Comm ──
+    {afsc:"3D0X1",title:"Knowledge Operations Management",group:"Cyber",type:"enlisted"},
+    {afsc:"3D0X2",title:"Cyber Systems Operations",group:"Cyber",type:"enlisted"},
+    {afsc:"3D0X3",title:"Cyber Surety",group:"Cyber",type:"enlisted"},
+    {afsc:"3D0X4",title:"Computer Systems Programming",group:"Cyber",type:"enlisted"},
+    {afsc:"3D1X1",title:"Client Systems",group:"Cyber",type:"enlisted"},
+    {afsc:"3D1X2",title:"Cyber Transport Systems",group:"Cyber",type:"enlisted"},
+    {afsc:"3D1X3",title:"RF Transmission Systems",group:"Cyber",type:"enlisted"},
+    {afsc:"3D1X4",title:"Spectrum Operations",group:"Cyber",type:"enlisted"},
+    {afsc:"3D1X7",title:"Cable & Antenna Systems",group:"Cyber",type:"enlisted"},
+    // ── Civil Engineering ──
+    {afsc:"3E0X1",title:"Electrical Systems",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E0X2",title:"Electrical Power Production",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E1X1",title:"Heating Ventilation AC & Refrigeration",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E2X1",title:"Pavements & Construction Equipment",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E3X1",title:"Structural",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E4X1",title:"Water & Fuel Systems Maintenance",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E4X3",title:"Pest Management",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E5X1",title:"Engineering",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E6X1",title:"Operations Management",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E7X1",title:"Fire Protection",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E8X1",title:"Explosive Ordnance Disposal",group:"Civil Engineering",type:"enlisted"},
+    {afsc:"3E9X1",title:"Emergency Management",group:"Civil Engineering",type:"enlisted"},
+    // ── Force Support ──
+    {afsc:"3F0X1",title:"Personnel",group:"Force Support",type:"enlisted"},
+    {afsc:"3F1X1",title:"Services",group:"Force Support",type:"enlisted"},
+    {afsc:"3F2X1",title:"Education & Training",group:"Force Support",type:"enlisted"},
+    {afsc:"3F3X1",title:"Manpower",group:"Force Support",type:"enlisted"},
+    {afsc:"3F4X1",title:"Equal Opportunity",group:"Force Support",type:"enlisted"},
+    {afsc:"3F5X1",title:"Administration",group:"Force Support",type:"enlisted"},
+    {afsc:"3H0X1",title:"Historian",group:"Force Support",type:"enlisted"},
+    {afsc:"3M0X1",title:"Services",group:"Force Support",type:"enlisted"},
+    {afsc:"3N0X1",title:"Public Affairs - Broadcast",group:"Public Affairs",type:"enlisted"},
+    {afsc:"3N0X2",title:"Public Affairs - Photojournalist",group:"Public Affairs",type:"enlisted"},
+    {afsc:"3N0X5",title:"Public Affairs - Multimedia",group:"Public Affairs",type:"enlisted"},
+    {afsc:"3N1X1",title:"Regional Band",group:"Public Affairs",type:"enlisted"},
+    {afsc:"3N2X1",title:"Premier Band",group:"Public Affairs",type:"enlisted"},
+    {afsc:"3P0X1",title:"Security Forces",group:"Security Forces",type:"enlisted"},
+    {afsc:"3S0X1",title:"Personnel",group:"Force Support",type:"enlisted"},
+    {afsc:"3S1X1",title:"Military Equal Opportunity",group:"Force Support",type:"enlisted"},
+    {afsc:"3S2X1",title:"Education & Training",group:"Force Support",type:"enlisted"},
+    {afsc:"3S3X1",title:"Manpower",group:"Force Support",type:"enlisted"},
+    // ── Medical ──
+    {afsc:"4A0X1",title:"Health Services Management",group:"Medical",type:"enlisted"},
+    {afsc:"4A1X1",title:"Medical Materiel",group:"Medical",type:"enlisted"},
+    {afsc:"4A2X1",title:"Biomedical Equipment",group:"Medical",type:"enlisted"},
+    {afsc:"4B0X1",title:"Bioenvironmental Engineering",group:"Medical",type:"enlisted"},
+    {afsc:"4C0X1",title:"Mental Health Service",group:"Medical",type:"enlisted"},
+    {afsc:"4D0X1",title:"Diet Therapy",group:"Medical",type:"enlisted"},
+    {afsc:"4E0X1",title:"Public Health",group:"Medical",type:"enlisted"},
+    {afsc:"4H0X1",title:"Cardiopulmonary Laboratory",group:"Medical",type:"enlisted"},
+    {afsc:"4J0X2",title:"Physical Medicine",group:"Medical",type:"enlisted"},
+    {afsc:"4M0X1",title:"Aerospace & Operational Physiology",group:"Medical",type:"enlisted"},
+    {afsc:"4N0X1",title:"Aerospace Medical Service",group:"Medical",type:"enlisted"},
+    {afsc:"4N1X1",title:"Surgical Service",group:"Medical",type:"enlisted"},
+    {afsc:"4P0X1",title:"Pharmacy",group:"Medical",type:"enlisted"},
+    {afsc:"4R0X1",title:"Diagnostic Imaging",group:"Medical",type:"enlisted"},
+    {afsc:"4T0X1",title:"Medical Laboratory",group:"Medical",type:"enlisted"},
+    {afsc:"4T0X2",title:"Histopathology",group:"Medical",type:"enlisted"},
+    {afsc:"4V0X1",title:"Ophthalmic",group:"Medical",type:"enlisted"},
+    {afsc:"4Y0X1",title:"Dental Assistant",group:"Medical",type:"enlisted"},
+    {afsc:"4Y0X2",title:"Dental Laboratory",group:"Medical",type:"enlisted"},
+    // ── Legal / Chaplain / Other ──
+    {afsc:"5C0X1",title:"Command & Control",group:"Command",type:"enlisted"},
+    {afsc:"5J0X1",title:"Paralegal",group:"Legal",type:"enlisted"},
+    {afsc:"5R0X1",title:"Chaplain Assistant",group:"Chaplain",type:"enlisted"},
+    {afsc:"6C0X1",title:"Contracting",group:"Contracting",type:"enlisted"},
+    {afsc:"6F0X1",title:"Financial Management & Comptroller",group:"Finance",type:"enlisted"},
+    // ── Special Duty / Reporting ──
+    {afsc:"7S0X1",title:"Special Investigations",group:"OSI",type:"enlisted"},
+    {afsc:"8A1X1",title:"Career Assistance Advisor",group:"Special Duty",type:"enlisted"},
+    {afsc:"8B0X1",title:"Military Training Instructor",group:"Special Duty",type:"enlisted"},
+    {afsc:"8B1X1",title:"Military Training Leader",group:"Special Duty",type:"enlisted"},
+    {afsc:"8C0X0",title:"Family Support",group:"Special Duty",type:"enlisted"},
+    {afsc:"8D0X0",title:"Linguist Debriefer",group:"Special Duty",type:"enlisted"},
+    {afsc:"8G0X0",title:"USAF Honor Guard",group:"Special Duty",type:"enlisted"},
+    {afsc:"8J0X0",title:"Correctional Custody Supervisor",group:"Special Duty",type:"enlisted"},
+    {afsc:"8M0X0",title:"Postal",group:"Special Duty",type:"enlisted"},
+    {afsc:"8P0X0",title:"Courier",group:"Special Duty",type:"enlisted"},
+    {afsc:"8R0X0",title:"Recruiter",group:"Special Duty",type:"enlisted"},
+    {afsc:"8S0X0",title:"Missile Facility Manager",group:"Special Duty",type:"enlisted"},
+    {afsc:"8T0X0",title:"Professional Military Education Instructor",group:"Special Duty",type:"enlisted"},
+    {afsc:"9A0X0",title:"Aviation Resource Management",group:"Reporting",type:"enlisted"},
+    {afsc:"9E0X0",title:"Emergency Management",group:"Reporting",type:"enlisted"},
+    {afsc:"9G1X1",title:"Group Superintendent",group:"Reporting",type:"enlisted"},
+    {afsc:"9J0X0",title:"Jail NCO",group:"Reporting",type:"enlisted"},
+    {afsc:"9L0X0",title:"Interpreter/Translator",group:"Reporting",type:"enlisted"},
+    {afsc:"9P0X0",title:"Patient Administration",group:"Reporting",type:"enlisted"},
+    {afsc:"9R0X0",title:"Civil Air Patrol NCO",group:"Reporting",type:"enlisted"},
+    {afsc:"9S1X0",title:"Scientific Applications Specialist",group:"Reporting",type:"enlisted"},
+    {afsc:"9T0X0",title:"Basic Enlisted Airman",group:"Reporting",type:"enlisted"},
+    {afsc:"9U0X0",title:"Manpower & Personnel",group:"Reporting",type:"enlisted"},
+    // ── Officer Support / Acquisition / etc ──
+    {afsc:"21AX",title:"Aircraft Maintenance",group:"Maintenance",type:"officer"},
+    {afsc:"21MX",title:"Munitions & Missile Maintenance",group:"Maintenance",type:"officer"},
+    {afsc:"21RX",title:"Logistics Readiness",group:"Logistics",type:"officer"},
+    {afsc:"31PX",title:"Security Forces",group:"Security Forces",type:"officer"},
+    {afsc:"32EX",title:"Civil Engineer",group:"Civil Engineering",type:"officer"},
+    {afsc:"33SX",title:"Communications & Information",group:"Cyber",type:"officer"},
+    {afsc:"34MX",title:"Services",group:"Force Support",type:"officer"},
+    {afsc:"35BX",title:"Band",group:"Public Affairs",type:"officer"},
+    {afsc:"35PX",title:"Public Affairs",group:"Public Affairs",type:"officer"},
+    {afsc:"36PX",title:"Personnel",group:"Force Support",type:"officer"},
+    {afsc:"38FX",title:"Force Support",group:"Force Support",type:"officer"},
+    {afsc:"38PX",title:"Programming & Budget",group:"Finance",type:"officer"},
+    {afsc:"41AX",title:"Health Services Administrator",group:"Medical",type:"officer"},
+    {afsc:"42BX",title:"Physical Therapist",group:"Medical",type:"officer"},
+    {afsc:"42GX",title:"Physician Assistant",group:"Medical",type:"officer"},
+    {afsc:"42NX",title:"Audiologist/Speech Pathologist",group:"Medical",type:"officer"},
+    {afsc:"42PX",title:"Clinical Psychologist",group:"Medical",type:"officer"},
+    {afsc:"42SX",title:"Clinical Social Worker",group:"Medical",type:"officer"},
+    {afsc:"42TX",title:"Occupational Therapist",group:"Medical",type:"officer"},
+    {afsc:"43AX",title:"Aerospace & Operational Physiologist",group:"Medical",type:"officer"},
+    {afsc:"43BX",title:"Biomedical Clinician",group:"Medical",type:"officer"},
+    {afsc:"43DX",title:"Dietitian",group:"Medical",type:"officer"},
+    {afsc:"43EX",title:"Bioenvironmental Engineer",group:"Medical",type:"officer"},
+    {afsc:"43HX",title:"Public Health Officer",group:"Medical",type:"officer"},
+    {afsc:"43TX",title:"Biomedical Laboratory",group:"Medical",type:"officer"},
+    {afsc:"44AX",title:"Chief Hospital/Clinic Services",group:"Medical",type:"officer"},
+    {afsc:"44EX",title:"Emergency Services Physician",group:"Medical",type:"officer"},
+    {afsc:"44FX",title:"Family Physician",group:"Medical",type:"officer"},
+    {afsc:"44GX",title:"General Practice Physician",group:"Medical",type:"officer"},
+    {afsc:"44MX",title:"Internist",group:"Medical",type:"officer"},
+    {afsc:"44NX",title:"Neurologist",group:"Medical",type:"officer"},
+    {afsc:"44PX",title:"Psychiatrist",group:"Medical",type:"officer"},
+    {afsc:"44RX",title:"Diagnostic Radiologist",group:"Medical",type:"officer"},
+    {afsc:"44SX",title:"Dermatologist",group:"Medical",type:"officer"},
+    {afsc:"44TX",title:"Pathologist",group:"Medical",type:"officer"},
+    {afsc:"44YX",title:"Critical Care Medicine",group:"Medical",type:"officer"},
+    {afsc:"45AX",title:"Anesthesiologist",group:"Medical",type:"officer"},
+    {afsc:"45BX",title:"Orthopedic Surgeon",group:"Medical",type:"officer"},
+    {afsc:"45EX",title:"Ophthalmologist",group:"Medical",type:"officer"},
+    {afsc:"45GX",title:"OB/GYN",group:"Medical",type:"officer"},
+    {afsc:"45NX",title:"Otorhinolaryngologist",group:"Medical",type:"officer"},
+    {afsc:"45SX",title:"Surgeon",group:"Medical",type:"officer"},
+    {afsc:"45UX",title:"Urologist",group:"Medical",type:"officer"},
+    {afsc:"46AX",title:"Nursing Administrator",group:"Medical",type:"officer"},
+    {afsc:"46FX",title:"Flight Nurse",group:"Medical",type:"officer"},
+    {afsc:"46MX",title:"Nurse Midwife",group:"Medical",type:"officer"},
+    {afsc:"46NX",title:"Clinical Nurse",group:"Medical",type:"officer"},
+    {afsc:"46PX",title:"Mental Health Nurse",group:"Medical",type:"officer"},
+    {afsc:"46SX",title:"Operating Room Nurse",group:"Medical",type:"officer"},
+    {afsc:"46YX",title:"Advanced Practice Nurse",group:"Medical",type:"officer"},
+    {afsc:"47BX",title:"Orthodontist",group:"Medical",type:"officer"},
+    {afsc:"47DX",title:"Oral & Maxillofacial Surgeon",group:"Medical",type:"officer"},
+    {afsc:"47EX",title:"Endodontist",group:"Medical",type:"officer"},
+    {afsc:"47GX",title:"Dentist",group:"Medical",type:"officer"},
+    {afsc:"47HX",title:"Periodontist",group:"Medical",type:"officer"},
+    {afsc:"47KX",title:"Pediatric Dentist",group:"Medical",type:"officer"},
+    {afsc:"47PX",title:"Prosthodontist",group:"Medical",type:"officer"},
+    {afsc:"47SX",title:"Oral & Maxillofacial Pathologist",group:"Medical",type:"officer"},
+    {afsc:"48AX",title:"Aerospace Medicine Physician",group:"Medical",type:"officer"},
+    {afsc:"48GX",title:"General Medical Officer",group:"Medical",type:"officer"},
+    {afsc:"48RX",title:"Residency Trained Flight Surgeon",group:"Medical",type:"officer"},
+    {afsc:"48VX",title:"Pilot Physician",group:"Medical",type:"officer"},
+    {afsc:"51JX",title:"Judge Advocate",group:"Legal",type:"officer"},
+    {afsc:"52RX",title:"Chaplain",group:"Chaplain",type:"officer"},
+    {afsc:"61AX",title:"Operations Research Analyst",group:"Acquisition",type:"officer"},
+    {afsc:"61BX",title:"Behavioral Scientist",group:"Acquisition",type:"officer"},
+    {afsc:"61CX",title:"Chemist/Nuclear Chemist",group:"Acquisition",type:"officer"},
+    {afsc:"61DX",title:"Physicist/Nuclear Engineer",group:"Acquisition",type:"officer"},
+    {afsc:"62EX",title:"Developmental Engineer",group:"Acquisition",type:"officer"},
+    {afsc:"63AX",title:"Acquisition Manager",group:"Acquisition",type:"officer"},
+    {afsc:"64PX",title:"Contracting",group:"Contracting",type:"officer"},
+    {afsc:"65FX",title:"Financial Management",group:"Finance",type:"officer"},
+    {afsc:"65WX",title:"Cost Analysis",group:"Finance",type:"officer"},
+    {afsc:"71SX",title:"Special Investigations Officer",group:"OSI",type:"officer"},
+    {afsc:"81CX",title:"Training Commander",group:"Command",type:"officer"},
+    {afsc:"81TX",title:"Instructor",group:"Command",type:"officer"},
+    {afsc:"82AX",title:"Academic Program Manager",group:"Command",type:"officer"},
+    {afsc:"86MX",title:"Operations Management",group:"Command",type:"officer"},
+    {afsc:"86PX",title:"Command & Control",group:"Command",type:"officer"},
+    {afsc:"90G0",title:"General Officer",group:"Command",type:"officer"},
+    {afsc:"91C0",title:"Wing Commander",group:"Command",type:"officer"},
+    {afsc:"91W0",title:"Wing Staff",group:"Command",type:"officer"},
+    {afsc:"92J0",title:"Aide-de-Camp",group:"Command",type:"officer"},
+    {afsc:"92S0",title:"Student",group:"Command",type:"officer"},
+    {afsc:"92T0",title:"Flying Training",group:"Command",type:"officer"}
+];
 
-    // ─── State ───
-    var uploadedPdfBuffer = null;
-    var currentAfsc = '';
+// ═══════════════════════════════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════════════════════════════
+var uploadedPdfBuffer = null;
+var currentAfsc = '';
+var currentFilter = 'all';
 
-    // ─── Sanitization Utilities ───
-    function sanitizeInput(input) {
-        if (typeof input !== 'string') return '';
-        return input.replace(/[^A-Za-z0-9]/g, '').toUpperCase().substring(0, 10);
+// ═══════════════════════════════════════════════════════════════════════════════
+// Sanitization
+// ═══════════════════════════════════════════════════════════════════════════════
+function sanitize(s) {
+    if (typeof s !== 'string') return '';
+    return s.replace(/[^A-Za-z0-9]/g, '').toUpperCase().substring(0, 10);
+}
+
+function escapeHtml(s) {
+    if (typeof s !== 'string') return '';
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(s));
+    return d.innerHTML;
+}
+
+function safeName(s) {
+    if (typeof s !== 'string') return 'download';
+    return s.replace(/[^A-Za-z0-9_\-]/g, '');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// URL Builders
+// ═══════════════════════════════════════════════════════════════════════════════
+function pdfUrl(afsc) {
+    var a = sanitize(afsc).toLowerCase();
+    return 'https://static.e-publishing.af.mil/production/1/af_a1/publication/cfetp' + a + '/cfetp' + a + '.pdf';
+}
+
+function epubsUrl(afsc) {
+    var a = sanitize(afsc);
+    return 'https://e-publishing.af.mil/Product-Index/#/?view=search&keyword=' + encodeURIComponent(a) + '&is498=true';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Logging
+// ═══════════════════════════════════════════════════════════════════════════════
+function log(msg, type) {
+    type = type || 'info';
+    var panel = document.getElementById('logPanel');
+    panel.classList.remove('hidden');
+    var area = document.getElementById('logArea');
+    var e = document.createElement('div');
+    e.className = 'log-entry ' + type;
+    e.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    area.appendChild(e);
+    area.scrollTop = area.scrollHeight;
+}
+
+function setProgress(pct) {
+    var w = document.getElementById('progressWrap');
+    w.classList.add('active');
+    document.getElementById('progressBar').style.width = Math.min(Math.max(pct,0),100) + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// e-Pubs button from search bar
+// ═══════════════════════════════════════════════════════════════════════════════
+function openEpubsFromInput() {
+    var val = document.getElementById('searchInput').value.trim();
+    var clean = sanitize(val);
+    if (!clean) {
+        alert('Enter an AFSC first.');
+        return;
     }
+    log('Opening e-Publishing search for: ' + clean, 'info');
+    window.open(epubsUrl(clean), '_blank', 'noopener,noreferrer');
+}
 
-    function escapeHtml(str) {
-        if (typeof str !== 'string') return '';
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
+// ═══════════════════════════════════════════════════════════════════════════════
+// Build Table
+// ═══════════════════════════════════════════════════════════════════════════════
+function renderTable() {
+    var query = document.getElementById('searchInput').value.trim().toUpperCase();
+    var tbody = document.getElementById('afscTableBody');
+    tbody.innerHTML = '';
 
-    function sanitizeFilename(name) {
-        if (typeof name !== 'string') return 'download';
-        return name.replace(/[^A-Za-z0-9_\-]/g, '');
-    }
+    var counts = { showing: 0, enlisted: 0, officer: 0, direct: 0, search: 0 };
 
-    // ─── Build AFSC Grid ───
-    function buildGrid() {
-        var grid = document.getElementById('afscGrid');
-        AFSC_LIST.forEach(function(code) {
-            var chip = document.createElement('div');
-            chip.className = 'afsc-chip';
-            chip.textContent = code;
-            chip.setAttribute('role', 'button');
-            chip.setAttribute('tabindex', '0');
-            chip.addEventListener('click', function() {
-                document.getElementById('afscInput').value = code;
-                searchAFSC();
-            });
-            chip.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    document.getElementById('afscInput').value = code;
-                    searchAFSC();
-                }
-            });
-            grid.appendChild(chip);
-        });
-    }
+    AFSC_DATA.forEach(function(item) {
+        // Filter by type
+        if (currentFilter === 'enlisted' && item.type !== 'enlisted') return;
+        if (currentFilter === 'officer' && item.type !== 'officer') return;
 
-    // ─── Logging ───
-    function log(msg, type) {
-        type = type || 'info';
-        var bar = document.getElementById('statusBar');
-        var area = document.getElementById('logArea');
-        bar.classList.add('active');
-        var entry = document.createElement('div');
-        entry.className = 'log-entry ' + type;
-        var ts = new Date().toLocaleTimeString();
-        entry.textContent = '[' + ts + '] ' + msg;
-        area.appendChild(entry);
-        area.scrollTop = area.scrollHeight;
-    }
+        // Check if direct PDF likely exists (enlisted with X in AFSC)
+        var hasDirect = item.afsc.indexOf('X') !== -1;
 
-    function setProgress(pct) {
-        var wrap = document.getElementById('progressWrap');
-        var bar = document.getElementById('progressBar');
-        wrap.classList.add('active');
-        bar.style.width = Math.min(Math.max(pct, 0), 100) + '%';
-    }
+        if (currentFilter === 'direct' && !hasDirect) return;
 
-    // ─── URL Builders ───
-    // Direct PDF link (original method that works)
-    function buildCFETPPdfUrl(afsc) {
-        var clean = sanitizeInput(afsc).toLowerCase();
-        return 'https://static.e-publishing.af.mil/production/1/af_a1/publication/cfetp' + clean + '/cfetp' + clean + '.pdf';
-    }
-
-    // e-Publishing search URL with AFSC in the search bar (matches screenshot)
-    function buildEpubsSearchUrl(afsc) {
-        var clean = sanitizeInput(afsc);
-        return 'https://e-publishing.af.mil/Product-Index/#/?view=search&keyword=' + encodeURIComponent(clean);
-    }
-
-    // ─── Open e-Pubs Search ───
-    function openEpubsSearch() {
-        var input = document.getElementById('afscInput').value;
-        var clean = sanitizeInput(input);
-        if (!clean) {
-            alert('Please enter a valid AFSC code first.');
-            return;
+        // Search filter
+        if (query) {
+            var haystack = (item.afsc + ' ' + item.title + ' ' + item.group).toUpperCase();
+            if (haystack.indexOf(query) === -1) return;
         }
-        var url = buildEpubsSearchUrl(clean);
-        log('Opening e-Publishing search for: ' + clean, 'info');
-        window.open(url, '_blank', 'noopener,noreferrer');
-    }
 
-    // ─── Main Search ───
-    function searchAFSC() {
-        var raw = document.getElementById('afscInput').value;
-        var afsc = sanitizeInput(raw);
+        counts.showing++;
+        if (item.type === 'enlisted') counts.enlisted++;
+        if (item.type === 'officer') counts.officer++;
+        if (hasDirect) counts.direct++;
+        if (!hasDirect) counts.search++;
 
-        if (!afsc || afsc.length < 3) {
-            alert('Please enter a valid AFSC code (at least 3 characters).');
-            return;
+        var tr = document.createElement('tr');
+
+        // AFSC cell
+        var tdAfsc = document.createElement('td');
+        var codeSpan = document.createElement('span');
+        codeSpan.className = 'afsc-code';
+        codeSpan.textContent = item.afsc;
+        tdAfsc.appendChild(codeSpan);
+        var badge = document.createElement('span');
+        badge.className = 'type-badge ' + (item.type === 'enlisted' ? 'enl' : 'ofr');
+        badge.textContent = item.type === 'enlisted' ? 'ENL' : 'OFR';
+        tdAfsc.appendChild(badge);
+        tr.appendChild(tdAfsc);
+
+        // Title cell
+        var tdTitle = document.createElement('td');
+        tdTitle.className = 'afsc-title';
+        tdTitle.textContent = item.title;
+        tr.appendChild(tdTitle);
+
+        // Group cell
+        var tdGroup = document.createElement('td');
+        tdGroup.className = 'afsc-group';
+        tdGroup.textContent = item.group;
+        tr.appendChild(tdGroup);
+
+        // Actions cell
+        var tdActions = document.createElement('td');
+        var actDiv = document.createElement('div');
+        actDiv.className = 'actions-cell';
+
+        if (hasDirect) {
+            // PDF button
+            var pBtn = document.createElement('button');
+            pBtn.className = 'btn btn-pdf btn-sm';
+            pBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+            pBtn.addEventListener('click', function() {
+                currentAfsc = item.afsc;
+                log('Opening PDF: CFETP' + item.afsc, 'info');
+                window.open(pdfUrl(item.afsc), '_blank', 'noopener,noreferrer');
+                showUploadPanel();
+            });
+            actDiv.appendChild(pBtn);
+
+            // RTF button
+            var rBtn = document.createElement('button');
+            rBtn.className = 'btn btn-rtf btn-sm';
+            rBtn.innerHTML = '<i class="fas fa-file-word"></i> RTF';
+            rBtn.addEventListener('click', function() {
+                currentAfsc = item.afsc;
+                showConvertModal(item.afsc, 'rtf');
+            });
+            actDiv.appendChild(rBtn);
+
+            // HTML button
+            var hBtn = document.createElement('button');
+            hBtn.className = 'btn btn-html btn-sm';
+            hBtn.innerHTML = '<i class="fas fa-file-code"></i> HTML';
+            hBtn.addEventListener('click', function() {
+                currentAfsc = item.afsc;
+                showConvertModal(item.afsc, 'html');
+            });
+            actDiv.appendChild(hBtn);
         }
 
-        currentAfsc = afsc;
-        document.getElementById('afscInput').value = afsc;
-        document.getElementById('searchBtn').disabled = true;
-
-        // Clear previous results
-        document.getElementById('logArea').innerHTML = '';
-        document.getElementById('resultsContainer').innerHTML = '';
-        document.getElementById('progressWrap').classList.remove('active');
-
-        log('Searching for CFETP: ' + afsc, 'info');
-        setProgress(10);
-
-        var pdfUrl = buildCFETPPdfUrl(afsc);
-        var epubsUrl = buildEpubsSearchUrl(afsc);
-
-        log('Direct PDF URL: ' + pdfUrl, 'info');
-        log('e-Publishing search URL: ' + epubsUrl, 'info');
-        setProgress(50);
-
-        // Build results UI
-        var resultsSection = document.getElementById('resultsSection');
-        var resultsContainer = document.getElementById('resultsContainer');
-        var resultTitle = document.getElementById('resultTitle');
-        var resultBadge = document.getElementById('resultBadge');
-
-        // Set title
-        resultTitle.innerHTML = '';
-        var icon = document.createElement('i');
-        icon.className = 'fas fa-file-alt';
-        resultTitle.appendChild(icon);
-        resultTitle.appendChild(document.createTextNode(' CFETP ' + afsc));
-
-        resultBadge.innerHTML = '<span class="badge badge-found">Ready</span>';
-
-        // Build result card using DOM methods (safe, no innerHTML with user data)
-        var card = document.createElement('div');
-        card.className = 'result-card';
-
-        var titleDiv = document.createElement('div');
-        titleDiv.className = 'title';
-        titleDiv.textContent = 'CFETP' + afsc + ' — Career Field Education & Training Plan';
-        card.appendChild(titleDiv);
-
-        var prodDiv = document.createElement('div');
-        prodDiv.className = 'product-num';
-        prodDiv.textContent = 'Product Number: CFETP' + afsc;
-        card.appendChild(prodDiv);
-
-        var metaDiv = document.createElement('div');
-        metaDiv.className = 'meta';
-        metaDiv.textContent = 'Source: Department of the Air Force e-Publishing • ';
-        var epubsLink = document.createElement('a');
-        epubsLink.className = 'epubs-link';
-        epubsLink.href = '#';
-        epubsLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.open(epubsUrl, '_blank', 'noopener,noreferrer');
+        // e-Pubs search button (always shown)
+        var sBtn = document.createElement('button');
+        sBtn.className = 'btn btn-search btn-sm';
+        sBtn.innerHTML = '<i class="fas fa-search"></i> Search';
+        sBtn.addEventListener('click', function() {
+            log('Opening e-Publishing search for ' + item.afsc, 'info');
+            window.open(epubsUrl(item.afsc), '_blank', 'noopener,noreferrer');
         });
-        var linkIcon = document.createElement('i');
-        linkIcon.className = 'fas fa-external-link-alt';
-        epubsLink.appendChild(linkIcon);
-        epubsLink.appendChild(document.createTextNode(' Search on e-Publishing'));
-        metaDiv.appendChild(epubsLink);
-        card.appendChild(metaDiv);
+        actDiv.appendChild(sBtn);
 
-        // Action buttons
-        var actionsDiv = document.createElement('div');
-        actionsDiv.className = 'result-actions';
+        tdActions.appendChild(actDiv);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+    });
 
-        // PDF Button — direct download
-        var pdfBtn = document.createElement('button');
-        pdfBtn.className = 'btn btn-danger btn-sm';
-        pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
-        pdfBtn.title = 'Download PDF directly from e-Publishing';
-        pdfBtn.addEventListener('click', function() {
-            log('Opening direct PDF link for CFETP' + afsc, 'info');
-            window.open(pdfUrl, '_blank', 'noopener,noreferrer');
-        });
-        actionsDiv.appendChild(pdfBtn);
+    // Update stats
+    document.getElementById('statShowing').textContent = counts.showing;
+    document.getElementById('statEnlisted').textContent = counts.enlisted;
+    document.getElementById('statOfficer').textContent = counts.officer;
+    document.getElementById('statDirect').textContent = counts.direct;
+    document.getElementById('statSearch').textContent = counts.search;
+}
 
-        // RTF Button — instructs user to upload
-        var rtfBtn = document.createElement('button');
-        rtfBtn.className = 'btn btn-warning btn-sm';
-        rtfBtn.innerHTML = '<i class="fas fa-file-word"></i> RTF';
-        rtfBtn.title = 'Convert PDF to Rich Text Format';
-        rtfBtn.addEventListener('click', function() {
-            showConvertModal(afsc, 'rtf');
-        });
-        actionsDiv.appendChild(rtfBtn);
+// ═══════════════════════════════════════════════════════════════════════════════
+// Filter
+// ═══════════════════════════════════════════════════════════════════════════════
+function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderTable();
+}
 
-        // HTML Button — instructs user to upload
-        var htmlBtn = document.createElement('button');
-        htmlBtn.className = 'btn btn-info btn-sm';
-        htmlBtn.innerHTML = '<i class="fas fa-file-code"></i> HTML';
-        htmlBtn.title = 'Convert PDF to HTML file';
-        htmlBtn.addEventListener('click', function() {
-            showConvertModal(afsc, 'html');
-        });
-        actionsDiv.appendChild(htmlBtn);
+// ═══════════════════════════════════════════════════════════════════════════════
+// Show upload panel
+// ═══════════════════════════════════════════════════════════════════════════════
+function showUploadPanel() {
+    document.getElementById('uploadPanel').classList.remove('hidden');
+}
 
-        // e-Pubs Search Button — opens e-Publishing with AFSC in search bar
-        var epubsBtn = document.createElement('button');
-        epubsBtn.className = 'btn btn-primary btn-sm';
-        epubsBtn.innerHTML = '<i class="fas fa-search"></i> e-Pubs Search';
-        epubsBtn.title = 'Search for this AFSC on e-Publishing';
-        epubsBtn.addEventListener('click', function() {
-            log('Opening e-Publishing search for: ' + afsc, 'info');
-            window.open(epubsUrl, '_blank', 'noopener,noreferrer');
-        });
-        actionsDiv.appendChild(epubsBtn);
+// ═══════════════════════════════════════════════════════════════════════════════
+// Convert Modal
+// ═══════════════════════════════════════════════════════════════════════════════
+function showConvertModal(afsc, format) {
+    var clean = sanitize(afsc);
+    document.getElementById('modalMsg').textContent =
+        'To convert CFETP ' + clean + ' to ' + format.toUpperCase() +
+        ': Download the PDF first, then drag & drop it into the upload area below.';
+    document.getElementById('confirmModal').classList.add('active');
+    document.getElementById('modalConfirm').onclick = function() {
+        closeModal();
+        log('Opening PDF for CFETP ' + clean, 'info');
+        window.open(pdfUrl(clean), '_blank', 'noopener,noreferrer');
+        showUploadPanel();
+        document.getElementById('uploadPanel').scrollIntoView({ behavior: 'smooth' });
+    };
+}
 
-        card.appendChild(actionsDiv);
+function closeModal() {
+    document.getElementById('confirmModal').classList.remove('active');
+}
 
-        resultsContainer.innerHTML = '';
-        resultsContainer.appendChild(card);
-        resultsSection.classList.add('active');
+// ═══════════════════════════════════════════════════════════════════════════════
+// File Upload
+// ═══════════════════════════════════════════════════════════════════════════════
+function setupUpload() {
+    var area = document.getElementById('uploadArea');
+    var input = document.getElementById('fileInput');
 
-        // Show upload section
-        document.getElementById('uploadSection').classList.add('active');
+    area.addEventListener('click', function() { input.click(); });
+    area.addEventListener('dragover', function(e) { e.preventDefault(); area.classList.add('dragover'); });
+    area.addEventListener('dragleave', function(e) { e.preventDefault(); area.classList.remove('dragover'); });
+    area.addEventListener('drop', function(e) {
+        e.preventDefault(); area.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+    input.addEventListener('change', function() {
+        if (input.files.length > 0) handleFile(input.files[0]);
+    });
+}
 
+function handleFile(file) {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
+        alert('Only PDF files are accepted.'); return;
+    }
+    if (file.size > 100*1024*1024) { alert('File too large (max 100MB).'); return; }
+    if (file.size < 100) { alert('File too small to be valid.'); return; }
+
+    log('File: ' + file.name + ' (' + (file.size/1024).toFixed(1) + ' KB)', 'info');
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var buf = e.target.result;
+        var hdr = new Uint8Array(buf.slice(0,5));
+        var magic = String.fromCharCode(hdr[0],hdr[1],hdr[2],hdr[3],hdr[4]);
+        if (magic !== '%PDF-') { alert('Not a valid PDF file.'); return; }
+
+        uploadedPdfBuffer = buf;
+        log('PDF validated. Ready for conversion.', 'success');
+
+        var nameEl = document.getElementById('uploadedFileName');
+        nameEl.textContent = '';
+        var ck = document.createElement('i');
+        ck.className = 'fas fa-check-circle';
+        ck.style.color = 'var(--green)';
+        nameEl.appendChild(ck);
+        nameEl.appendChild(document.createTextNode(' ' + file.name));
+        document.getElementById('uploadActions').classList.remove('hidden');
+    };
+    reader.onerror = function() { alert('Error reading file.'); };
+    reader.readAsArrayBuffer(file);
+}
+
+function clearUpload() {
+    uploadedPdfBuffer = null;
+    document.getElementById('fileInput').value = '';
+    document.getElementById('uploadActions').classList.add('hidden');
+    log('Upload cleared.', 'info');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Convert
+// ═══════════════════════════════════════════════════════════════════════════════
+async function convertUploadedFile(format) {
+    if (['rtf','html'].indexOf(format) === -1) return;
+    if (!uploadedPdfBuffer) { alert('Upload a PDF first.'); return; }
+
+    var afsc = currentAfsc || 'UNKNOWN';
+    log('Converting to ' + format.toUpperCase() + '...', 'info');
+    setProgress(5);
+
+    try {
+        var pages = await extractText(uploadedPdfBuffer);
+        if (!pages || pages.length === 0) throw new Error('No pages extracted.');
+
+        var chars = pages.reduce(function(s,p){ return s + p.text.length; }, 0);
+        log('Extracted ' + chars + ' chars from ' + pages.length + ' pages.', 'info');
+        if (chars < 50) log('Warning: Very little text. PDF may be scanned/image-based.', 'warn');
+
+        setProgress(80);
+        if (format === 'rtf') downloadRTF(pages, afsc);
+        else downloadHTML(pages, afsc);
         setProgress(100);
-        log('Ready. Use PDF for direct download, or download then upload below to convert to RTF/HTML.', 'success');
-        log('e-Pubs Search will open e-Publishing with "' + afsc + '" in the search bar.', 'info');
+        log(format.toUpperCase() + ' download started!', 'success');
+    } catch(err) {
+        log('Error: ' + err.message, 'error');
+        setProgress(0);
+    }
+}
 
-        document.getElementById('searchBtn').disabled = false;
+// ═══════════════════════════════════════════════════════════════════════════════
+// PDF.js Text Extraction
+// ═══════════════════════════════════════════════════════════════════════════════
+async function extractText(buf) {
+    var pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+    var n = pdf.numPages;
+    log('PDF: ' + n + ' pages. Extracting...', 'info');
+    var pages = [];
+
+    for (var i = 1; i <= n; i++) {
+        var page = await pdf.getPage(i);
+        var content = await page.getTextContent();
+        var lines = [];
+        var lastY = null;
+
+        for (var j = 0; j < content.items.length; j++) {
+            var item = content.items[j];
+            if (typeof item.str !== 'string') continue;
+            var y = item.transform ? item.transform[5] : null;
+            if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) lines.push('\n');
+            lines.push(item.str);
+            if (y !== null) lastY = y;
+        }
+
+        pages.push({ pageNum: i, text: lines.join('').replace(/\n{3,}/g,'\n\n').trim() });
+        setProgress(5 + Math.round((i/n)*70));
+        if (i % 20 === 0 || i === n) log('Page ' + i + '/' + n, 'info');
+    }
+    return pages;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RTF Builder
+// ═══════════════════════════════════════════════════════════════════════════════
+function escapeRtf(s) {
+    if (typeof s !== 'string') return '';
+    var o = '';
+    for (var i = 0; i < s.length; i++) {
+        var c = s[i], code = s.charCodeAt(i);
+        if (c === '\\') o += '\\\\';
+        else if (c === '{') o += '\\{';
+        else if (c === '}') o += '\\}';
+        else if (code > 127) o += '\\u' + code + '?';
+        else o += c;
+    }
+    return o;
+}
+
+function downloadRTF(pages, afsc) {
+    var a = sanitize(afsc);
+    var r = '{\\rtf1\\ansi\\ansicpg1252\\deff0\n';
+    r += '{\\fonttbl{\\f0\\fswiss Calibri;}{\\f1\\fmodern Courier New;}}\n';
+    r += '{\\colortbl ;\\red0\\green51\\blue102;\\red0\\green0\\blue0;\\red128\\green128\\blue128;}\n';
+    r += '\\viewkind4\\uc1\n';
+    r += '\\pard\\qc\\f0\\fs36\\cf1\\b CFETP ' + escapeRtf(a) + '\\b0\\par\n';
+    r += '\\fs24\\cf3 Career Field Education & Training Plan\\par\n';
+    r += '\\fs18 Converted: ' + escapeRtf(new Date().toLocaleString()) + '\\par\n';
+    r += '\\pard\\par\\page\n';
+
+    for (var i = 0; i < pages.length; i++) {
+        r += '\\pard\\f0\\fs22\\cf1\\b Page ' + pages[i].pageNum + '\\b0\\par\n';
+        r += '\\pard\\cf2\\fs20 ';
+        pages[i].text.split('\n').forEach(function(line) { r += escapeRtf(line) + '\\par\n'; });
+        r += '\\par\n';
+        if (i < pages.length - 1) r += '\\page\n';
+    }
+    r += '}';
+
+    triggerDL(new Blob([r], {type:'application/rtf'}), 'CFETP_' + safeName(a) + '.rtf');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HTML Builder
+// ═══════════════════════════════════════════════════════════════════════════════
+function downloadHTML(pages, afsc) {
+    var a = sanitize(afsc);
+    var ea = escapeHtml(a);
+    var dt = escapeHtml(new Date().toLocaleString());
+
+    var h = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">';
+    h += '<meta name="viewport" content="width=device-width,initial-scale=1.0">';
+    h += '<title>CFETP ' + ea + '</title>';
+    h += '<style>';
+    h += 'body{font-family:Segoe UI,sans-serif;max-width:900px;margin:0 auto;padding:20px;background:#f5f5f5;color:#222;}';
+    h += 'h1{color:#1a3a5c;border-bottom:3px solid #f0b400;padding-bottom:10px;}';
+    h += '.meta{color:#666;font-size:.85rem;margin-bottom:30px;}';
+    h += '.page{background:#fff;border:1px solid #ddd;border-radius:8px;padding:25px;margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,.05);}';
+    h += '.page h2{color:#1a3a5c;font-size:1rem;border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:15px;}';
+    h += '.page-content{white-space:pre-wrap;word-wrap:break-word;font-size:.9rem;line-height:1.7;}';
+    h += '@media print{.page{break-inside:avoid;box-shadow:none;}body{background:#fff;}}';
+    h += '</style></head><body>';
+    h += '<h1>CFETP ' + ea + '</h1>';
+    h += '<div class="meta">Career Field Education & Training Plan • Converted: ' + dt + '</div>';
+
+    for (var i = 0; i < pages.length; i++) {
+        h += '<div class="page"><h2>Page ' + pages[i].pageNum + '</h2>';
+        h += '<div class="page-content">' + escapeHtml(pages[i].text) + '</div></div>';
     }
 
-    // ─── Show Convert Modal ───
-    function showConvertModal(afsc, format) {
-        var clean = sanitizeInput(afsc);
-        if (!clean) return;
-        var validFormats = ['rtf', 'html'];
-        if (validFormats.indexOf(format) === -1) return;
-
-        var formatLabel = format.toUpperCase();
-
-        // Check if a file is already uploaded
-        if (uploadedPdfBuffer) {
-            // File already uploaded, convert directly
-            convertUploadedFile(format);
-            return;
-        }
-
-        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-info-circle"></i> Convert to ' + formatLabel;
-        document.getElementById('modalMsg').textContent =
-            'To convert CFETP ' + clean + ' to ' + formatLabel + ':\n\n' +
-            '1. First click "Download PDF" to get the PDF file\n' +
-            '2. Then drag & drop the downloaded PDF into the upload area below\n' +
-            '3. Click "Convert to ' + formatLabel + '" to generate your file';
-
-        document.getElementById('confirmModal').classList.add('active');
-
-        document.getElementById('modalConfirm').onclick = function() {
-            closeModal();
-            // Open the PDF for download
-            var pdfUrl = buildCFETPPdfUrl(clean);
-            window.open(pdfUrl, '_blank', 'noopener,noreferrer');
-            log('PDF download opened. Upload the file below to convert to ' + formatLabel + '.', 'info');
-            // Scroll to upload section
-            setTimeout(function() {
-                document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-        };
-    }
-
-    function closeModal() {
-        document.getElementById('confirmModal').classList.remove('active');
-    }
-
-    // ─── File Upload Handling ───
-    function setupUpload() {
-        var uploadArea = document.getElementById('uploadArea');
-        var fileInput = document.getElementById('fileInput');
-
-        uploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        uploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.classList.add('dragover');
-        });
-
-        uploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadArea.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', function() {
-            if (fileInput.files.length > 0) {
-                handleFile(fileInput.files[0]);
-            }
-        });
-    }
-
-    function handleFile(file) {
-        if (!file) return;
-
-        // Validate file type
-        var validExt = file.name.toLowerCase().endsWith('.pdf');
-        if (!validExt && file.type !== 'application/pdf') {
-            log('Error: Only PDF files are accepted. Got: ' + (file.type || 'unknown'), 'error');
-            alert('Please upload a PDF file only.');
-            return;
-        }
-
-        // Validate file size (max 100MB)
-        if (file.size > 100 * 1024 * 1024) {
-            log('Error: File too large. Maximum 100MB.', 'error');
-            alert('File is too large. Maximum size is 100MB.');
-            return;
-        }
-
-        if (file.size < 100) {
-            log('Error: File too small to be a valid PDF.', 'error');
-            alert('File is too small to be a valid PDF.');
-            return;
-        }
-
-        var fileSizeKB = (file.size / 1024).toFixed(1);
-        log('File selected: ' + file.name + ' (' + fileSizeKB + ' KB)', 'info');
-
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var arrayBuffer = e.target.result;
-
-            // Validate PDF magic bytes (%PDF-)
-            var header = new Uint8Array(arrayBuffer.slice(0, 5));
-            var magic = String.fromCharCode(header[0], header[1], header[2], header[3], header[4]);
-            if (magic !== '%PDF-') {
-                log('Error: File does not have valid PDF header (%PDF-). Not a real PDF.', 'error');
-                alert('This file does not appear to be a valid PDF.');
-                return;
-            }
-
-            uploadedPdfBuffer = arrayBuffer;
-            log('PDF loaded and validated (' + fileSizeKB + ' KB). Ready for conversion.', 'success');
-
-            // Show upload actions with filename
-            var nameSpan = document.getElementById('uploadedFileName');
-            nameSpan.innerHTML = '';
-            var checkIcon = document.createElement('i');
-            checkIcon.className = 'fas fa-check-circle';
-            checkIcon.style.color = '#28a745';
-            nameSpan.appendChild(checkIcon);
-            nameSpan.appendChild(document.createTextNode(' ' + file.name));
-
-            document.getElementById('uploadActions').style.display = 'flex';
-        };
-
-        reader.onerror = function() {
-            log('Error reading file.', 'error');
-            alert('Error reading the file. Please try again.');
-        };
-
-        reader.readAsArrayBuffer(file);
-    }
-
-    function clearUpload() {
-        uploadedPdfBuffer = null;
-        document.getElementById('fileInput').value = '';
-        document.getElementById('uploadActions').style.display = 'none';
-        log('Upload cleared.', 'info');
-    }
-
-    // ─── Convert Uploaded File ───
-    async function convertUploadedFile(format) {
-        var validFormats = ['rtf', 'html'];
-        if (validFormats.indexOf(format) === -1) {
-            log('Error: Invalid format "' + format + '".', 'error');
-            return;
-        }
-
-        if (!uploadedPdfBuffer) {
-            alert('Please upload a PDF file first. Download the PDF using the PDF button, then drag & drop it into the upload area.');
-            return;
-        }
-
-        var afsc = currentAfsc || 'UNKNOWN';
-        var formatLabel = format.toUpperCase();
-
-        log('Starting ' + formatLabel + ' conversion...', 'info');
-        setProgress(5);
-
-        try {
-            // Extract text from PDF using PDF.js
-            var pages = await extractTextFromPDF(uploadedPdfBuffer);
-
-            if (!pages || pages.length === 0) {
-                throw new Error('No pages could be extracted from the PDF.');
-            }
-
-            // Count total characters
-            var totalChars = 0;
-            for (var p = 0; p < pages.length; p++) {
-                totalChars += pages[p].text.length;
-            }
-
-            log('Extracted ' + totalChars + ' characters from ' + pages.length + ' pages.', 'info');
-
-            if (totalChars < 10) {
-                log('Warning: Very little text extracted. The PDF may be image-based (scanned). OCR is not supported in the browser.', 'warn');
-            }
-
-            setProgress(85);
-
-            // Generate output file
-            if (format === 'rtf') {
-                buildAndDownloadRTF(pages, afsc);
-            } else if (format === 'html') {
-                buildAndDownloadHTML(pages, afsc);
-            }
-
-            setProgress(100);
-            log(formatLabel + ' conversion complete! File download initiated.', 'success');
-
-        } catch (err) {
-            log('Conversion error: ' + (err.message || err), 'error');
-            setProgress(0);
-            alert('Conversion failed: ' + (err.message || 'Unknown error') + '\n\nTry opening the e-Publishing search to find the document manually.');
-        }
-    }
-
-    // ─── PDF Text Extraction with PDF.js ───
-    async function extractTextFromPDF(arrayBuffer) {
-        log('Loading PDF with PDF.js...', 'info');
-        setProgress(10);
-
-        var loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
-        var pdf = await loadingTask.promise;
-        var totalPages = pdf.numPages;
-
-        log('PDF loaded: ' + totalPages + ' pages. Extracting text...', 'info');
-
-        var pages = [];
-
-        for (var i = 1; i <= totalPages; i++) {
-            var page = await pdf.getPage(i);
-            var textContent = await page.getTextContent();
-            var items = textContent.items;
-
-            // Build text with line break detection based on Y-coordinate changes
-            var lines = [];
-            var currentLine = '';
-            var lastY = null;
-
-            for (var j = 0; j < items.length; j++) {
-                var item = items[j];
-                if (typeof item.str !== 'string') continue;
-
-                var y = (item.transform && item.transform.length >= 6) ? item.transform[5] : null;
-
-                // If Y coordinate changed significantly, it's a new line
-                if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) {
-                    if (currentLine.trim()) {
-                        lines.push(currentLine.trim());
-                    }
-                    currentLine = item.str;
-                } else {
-                    // Same line — add space if needed
-                    if (currentLine && item.str && !currentLine.endsWith(' ') && !item.str.startsWith(' ')) {
-                        // Check if there's a gap (hasEOL or space between items)
-                        if (item.hasEOL) {
-                            if (currentLine.trim()) {
-                                lines.push(currentLine.trim());
-                            }
-                            currentLine = item.str;
-                        } else {
-                            currentLine += item.str;
-                        }
-                    } else {
-                        currentLine += item.str;
-                    }
-                }
-
-                if (y !== null) lastY = y;
-            }
-
-            // Push last line
-            if (currentLine.trim()) {
-                lines.push(currentLine.trim());
-            }
-
-            var pageText = lines.join('\n').replace(/\n{4,}/g, '\n\n\n').trim();
-
-            pages.push({
-                pageNum: i,
-                text: pageText
-            });
-
-            // Update progress
-            var pct = 15 + Math.round((i / totalPages) * 65);
-            setProgress(pct);
-
-            // Log every 10 pages or on last page
-            if (i % 10 === 0 || i === totalPages) {
-                log('Extracted page ' + i + ' of ' + totalPages, 'info');
-            }
-        }
-
-        return pages;
-    }
-
-    // ─── RTF Escape ───
-    function escapeRtf(str) {
-        if (typeof str !== 'string') return '';
-        var result = '';
-        for (var i = 0; i < str.length; i++) {
-            var ch = str[i];
-            var code = str.charCodeAt(i);
-            if (ch === '\\') {
-                result += '\\\\';
-            } else if (ch === '{') {
-                result += '\\{';
-            } else if (ch === '}') {
-                result += '\\}';
-            } else if (code > 127) {
-                result += '\\u' + code + '?';
-            } else {
-                result += ch;
-            }
-        }
-        return result;
-    }
-
-    // ─── Build & Download RTF ───
-    function buildAndDownloadRTF(pages, afsc) {
-        var clean = sanitizeInput(afsc);
-        var dateStr = new Date().toLocaleString();
-
-        var rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\n';
-        rtf += '{\\fonttbl{\\f0\\fswiss\\fcharset0 Calibri;}{\\f1\\fmodern\\fcharset0 Courier New;}}\n';
-        rtf += '{\\colortbl ;\\red26\\green58\\blue92;\\red0\\green0\\blue0;\\red136\\green136\\blue136;\\red240\\green180\\blue0;}\n';
-        rtf += '\\viewkind4\\uc1\n';
-
-        // Title page
-        rtf += '\\pard\\qc\\f0\\fs40\\cf1\\b CFETP ' + escapeRtf(clean) + '\\b0\\par\n';
-        rtf += '\\fs28\\cf4 Career Field Education & Training Plan\\par\n';
-        rtf += '\\fs22\\cf3 Department of the Air Force e-Publishing\\par\n';
-        rtf += '\\fs20\\cf3 Converted: ' + escapeRtf(dateStr) + '\\par\n';
-        rtf += '\\fs18\\cf3
-
-Source: static.e-publishing.af.mil\\par\n';
-        rtf += '\\pard\\par\\par\n';
-        rtf += '\\page\n';
-
-        // Content pages
-        for (var i = 0; i < pages.length; i++) {
-            var p = pages[i];
-
-            // Page header
-            rtf += '\\pard\\f0\\fs24\\cf1\\b Page ' + p.pageNum + ' of ' + pages.length + '\\b0\\par\n';
-            rtf += '\\pard\\brdrb\\brdrs\\brdrw10\\brsp20\\par\n';
-
-            // Page content
-            rtf += '\\pard\\cf2\\f0\\fs20 ';
-            var lines = p.text.split('\n');
-            for (var j = 0; j < lines.length; j++) {
-                rtf += escapeRtf(lines[j]) + '\\par\n';
-            }
-
-            rtf += '\\par\n';
-
-            // Page break (except last page)
-            if (i < pages.length - 1) {
-                rtf += '\\page\n';
-            }
-        }
-
-        rtf += '}';
-
-        var blob = new Blob([rtf], { type: 'application/rtf' });
-        var filename = 'CFETP_' + sanitizeFilename(clean) + '.rtf';
-        triggerDownload(blob, filename);
-        log('RTF file "' + filename + '" generated (' + (blob.size / 1024).toFixed(1) + ' KB).', 'success');
-    }
-
-    // ─── Build & Download HTML ───
-    function buildAndDownloadHTML(pages, afsc) {
-        var clean = sanitizeInput(afsc);
-        var escapedClean = escapeHtml(clean);
-        var escapedDate = escapeHtml(new Date().toLocaleString());
-
-        var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n';
-        html += '<meta charset="UTF-8">\n';
-        html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
-        html += '<title>CFETP ' + escapedClean + '</title>\n';
-        html += '<style>\n';
-        html += '* { margin: 0; padding: 0; box-sizing: border-box; }\n';
-        html += 'body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f5f5; color: #222; }\n';
-        html += '.doc-header { background: #1a3a5c; color: #f0b400; padding: 25px; border-radius: 10px 10px 0 0; text-align: center; margin-bottom: 0; }\n';
-        html += '.doc-header h1 { font-size: 1.6rem; margin-bottom: 5px; }\n';
-        html += '.doc-header p { color: #8899aa; font-size: 0.85rem; }\n';
-        html += '.doc-meta { background: #1b2838; color: #8899aa; padding: 12px 25px; font-size: 0.8rem; border-bottom: 3px solid #f0b400; margin-bottom: 20px; border-radius: 0 0 10px 10px; }\n';
-        html += '.page { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }\n';
-        html += '.page h2 { color: #1a3a5c; font-size: 1rem; border-bottom: 2px solid #f0b400; padding-bottom: 8px; margin-bottom: 15px; }\n';
-        html += '.page-content { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; line-height: 1.7; color: #333; }\n';
-        html += '.footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 40px; padding: 20px; border-top: 1px solid #ddd; }\n';
-        html += '@media print { .page { break-inside: avoid; box-shadow: none; } body { background: #fff; } .doc-header, .doc-meta { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }\n';
-        html += '</style>\n</head>\n<body>\n';
-
-        // Header
-        html += '<div class="doc-header">\n';
-        html += '<h1>CFETP ' + escapedClean + '</h1>\n';
-        html += '<p>Career Field Education & Training Plan</p>\n';
-        html += '</div>\n';
-        html += '<div class="doc-meta">Source: Department of the Air Force e-Publishing • Converted: ' + escapedDate + ' • Pages: ' + pages.length + '</div>\n';
-
-        // Pages
-        for (var i = 0; i < pages.length; i++) {
-            var p = pages[i];
-            html += '<div class="page">\n';
-            html += '<h2>Page ' + p.pageNum + ' of ' + pages.length + '</h2>\n';
-            html += '<div class="page-content">' + escapeHtml(p.text) + '</div>\n';
-            html += '</div>\n';
-        }
-
-        // Footer
-        html += '<div class="footer">Generated by AFSC CFETP Download Hub • ' + escapedDate + '</div>\n';
-        html += '</body>\n</html>';
-
-        var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-        var filename = 'CFETP_' + sanitizeFilename(clean) + '.html';
-        triggerDownload(blob, filename);
-        log('HTML file "' + filename + '" generated (' + (blob.size / 1024).toFixed(1) + ' KB).', 'success');
-    }
-
-    // ─── Download Trigger ───
-    function triggerDownload(blob, filename) {
-        // Extract and validate extension
-        var parts = filename.split('.');
-        var ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
-        var baseName = sanitizeFilename(parts.join(''));
-        var allowedExt = ['pdf', 'rtf', 'html'];
-        if (allowedExt.indexOf(ext) === -1) {
-            ext = 'txt';
-        }
-        var finalName = baseName + '.' + ext;
-
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = finalName;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(function() { URL.revokeObjectURL(url); }, 15000);
-    }
-
-    // ─── Keyboard Support ───
-    document.getElementById('afscInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            searchAFSC();
-        }
-    });
-
-    // Close modal on Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    });
-
-    // Close modal on overlay click
-    document.getElementById('confirmModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
-    });
-
-    // ─── Init ───
-    buildGrid();
-    setupUpload();
+    h += '<div style="text-align:center;color:#999;font-size:.75rem;margin-top:40px;border-top:1px solid #ddd;padding-top:20px;">Generated by AFSC CFETP Download Hub • ' + dt + '</div>';
+    h += '</body></html>';
+
+    triggerDL(new Blob([h], {type:'text/html;charset=utf-8'}), 'CFETP_' + safeName(a) + '.html');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Download Trigger
+// ═══════════════════════════════════════════════════════════════════════════════
+function triggerDL(blob, filename) {
+    var ext = filename.split('.').pop().toLowerCase();
+    if (['pdf','rtf','html'].indexOf(ext) === -1) ext = 'txt';
+    var fn = safeName(filename.replace(/\.[^.]+$/,'')) + '.' + ext;
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = fn; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 15000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Events
+// ═══════════════════════════════════════════════════════════════════════════════
+document.getElementById('searchInput').addEventListener('input', function() { renderTable(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+document.getElementById('confirmModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════════════════════════════
+renderTable();
+setupUpload();
 </script>
-
 </body>
 </html>
