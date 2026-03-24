@@ -229,6 +229,77 @@
             flex-wrap: wrap;
         }
 
+        /* Upload Section */
+        .upload-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .upload-section.active { display: block; }
+
+        .upload-section h2 {
+            font-size: 1rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-section > p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-dark);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(240, 180, 0, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(240, 180, 0, 0.1);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .upload-area p {
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        .upload-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
         /* Status / Log */
         .status-bar {
             background: var(--bg-card);
@@ -317,6 +388,30 @@
             font-weight: 700;
         }
 
+        /* Step Instructions */
+        .step-instructions {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step-instructions ol {
+            padding-left: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .step-instructions ol li {
+            margin-bottom: 4px;
+        }
+
+        .step-instructions ol li strong {
+            color: var(--accent);
+        }
+
         /* Modal */
         .modal-overlay {
             display: none;
@@ -335,13 +430,13 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 30px;
-            max-width: 500px;
+            max-width: 520px;
             width: 90%;
             text-align: center;
         }
 
         .modal h3 { color: var(--accent); margin-bottom: 15px; }
-        .modal p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem; }
+        .modal p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem; line-height: 1.6; }
         .modal .btn { margin: 0 5px; }
 
         .spinner {
@@ -378,12 +473,12 @@
         }
 
         .badge-found { background: var(--success); color: #fff; }
-        .badge-notfound { background: var(--danger); color: #fff; }
 
         @media (max-width: 600px) {
             .search-row { flex-direction: column; }
             .afsc-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
             .result-actions { flex-direction: column; }
+            .upload-actions { flex-direction: column; }
             .legend { flex-direction: column; gap: 8px; }
         }
     </style>
@@ -413,13 +508,13 @@
         </div>
         <div class="legend-item">
             <div class="legend-icon" style="background:var(--primary-light);"><i class="fas fa-search"></i></div>
-            Search — e-Publishing search fallback
+            e-Pubs — Search on e-Publishing
         </div>
     </div>
 
     <!-- Search Section -->
     <div class="search-section">
-        <h2><i class="fas fa-search"></i> Search AFSC on e-Publishing</h2>
+        <h2><i class="fas fa-search"></i> Search AFSC CFETP</h2>
         <div class="search-row">
             <div class="search-input-wrap">
                 <i class="fas fa-tag input-icon"></i>
@@ -434,9 +529,7 @@
             </button>
         </div>
 
-        <div class="afsc-grid" id="afscGrid">
-            <!-- Populated by JS -->
-        </div>
+        <div class="afsc-grid" id="afscGrid"></div>
     </div>
 
     <!-- Status Bar -->
@@ -457,24 +550,60 @@
         <div id="resultsContainer"></div>
     </div>
 
+    <!-- Upload / Convert Section -->
+    <div class="upload-section" id="uploadSection">
+        <h2><i class="fas fa-exchange-alt"></i> Convert Downloaded PDF to RTF or HTML</h2>
+        <p>Due to browser security (CORS), the PDF must be downloaded first, then uploaded here for conversion. This all happens locally in your browser — no data is sent anywhere.</p>
+
+        <div class="step-instructions">
+            <ol>
+                <li>Click the <strong>PDF</strong> button above to download the CFETP PDF file</li>
+                <li>Once downloaded, <strong>drag & drop</strong> the PDF below (or click to browse)</li>
+                <li>Choose <strong>Convert to RTF</strong> or <strong>Convert to HTML</strong></li>
+            </ol>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p><strong>Drop PDF here</strong> or click to browse</p>
+            <p style="font-size:0.75rem; margin-top:8px;">Accepts .pdf files only</p>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,application/pdf">
+
+        <div class="upload-actions" id="uploadActions" style="display:none;">
+            <span id="uploadedFileName" style="color:var(--accent); font-weight:600; font-size:0.9rem; display:flex; align-items:center; gap:6px;"></span>
+            <button class="btn btn-warning btn-sm" onclick="convertUploadedFile('rtf')">
+                <i class="fas fa-file-word"></i> Convert to RTF
+            </button>
+            <button class="btn btn-info btn-sm" onclick="convertUploadedFile('html')">
+                <i class="fas fa-file-code"></i> Convert to HTML
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="clearUpload()">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+    </div>
+
 </div>
 
 <!-- Confirmation Modal -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal">
-        <h3><i class="fas fa-download"></i> Confirm Download</h3>
-        <p id="modalMsg">Are you sure you want to download and convert this file?</p>
-        <button class="btn btn-success" id="modalConfirm">Yes, Proceed</button>
-        <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+        <h3 id="modalTitle"><i class="fas fa-info-circle"></i> Convert Document</h3>
+        <p id="modalMsg"></p>
+        <div id="modalButtons">
+            <button class="btn btn-success" id="modalConfirm">OK</button>
+            <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+        </div>
     </div>
 </div>
 
 <script>
-    // Configure PDF.js worker
+    // ─── Configure PDF.js worker ───
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     // ─── AFSC Master List ───
-    const AFSC_LIST = [
+    var AFSC_LIST = [
         "1A0X1","1A1X1","1A2X1","1A3X1","1A8X1","1A8X2","1A9X1",
         "1B4X1","1C0X2","1C1X1","1C2X1","1C3X1","1C4X1","1C5X1",
         "1C6X1","1C7X1","1C8X1","1D7X1","1N0X1","1N1X1","1N2X1",
@@ -504,7 +633,11 @@
         "9T0X0","9U0X0"
     ];
 
-    // ─── Sanitization Utility ───
+    // ─── State ───
+    var uploadedPdfBuffer = null;
+    var currentAfsc = '';
+
+    // ─── Sanitization Utilities ───
     function sanitizeInput(input) {
         if (typeof input !== 'string') return '';
         return input.replace(/[^A-Za-z0-9]/g, '').toUpperCase().substring(0, 10);
@@ -567,31 +700,34 @@
         bar.style.width = Math.min(Math.max(pct, 0), 100) + '%';
     }
 
-    // ─── e-Publishing URL Builder ───
-    function buildEpubsSearchUrl(afsc) {
-        var clean = sanitizeInput(afsc);
-        return 'https://e-publishing.af.mil/Product-Index/#/?view=search&keyword=CFETP%20' + encodeURIComponent(clean) + '&is498=true';
-    }
-
+    // ─── URL Builders ───
+    // Direct PDF link (original method that works)
     function buildCFETPPdfUrl(afsc) {
         var clean = sanitizeInput(afsc).toLowerCase();
         return 'https://static.e-publishing.af.mil/production/1/af_a1/publication/cfetp' + clean + '/cfetp' + clean + '.pdf';
     }
 
+    // e-Publishing search URL with AFSC in the search bar (matches screenshot)
+    function buildEpubsSearchUrl(afsc) {
+        var clean = sanitizeInput(afsc);
+        return 'https://e-publishing.af.mil/Product-Index/#/?view=search&keyword=' + encodeURIComponent(clean);
+    }
+
+    // ─── Open e-Pubs Search ───
     function openEpubsSearch() {
         var input = document.getElementById('afscInput').value;
         var clean = sanitizeInput(input);
         if (!clean) {
-            alert('Please enter a valid AFSC code.');
+            alert('Please enter a valid AFSC code first.');
             return;
         }
         var url = buildEpubsSearchUrl(clean);
-        log('Opening e-Publishing search for CFETP ' + clean, 'info');
+        log('Opening e-Publishing search for: ' + clean, 'info');
         window.open(url, '_blank', 'noopener,noreferrer');
     }
 
     // ─── Main Search ───
-    async function searchAFSC() {
+    function searchAFSC() {
         var raw = document.getElementById('afscInput').value;
         var afsc = sanitizeInput(raw);
 
@@ -600,10 +736,11 @@
             return;
         }
 
+        currentAfsc = afsc;
         document.getElementById('afscInput').value = afsc;
         document.getElementById('searchBtn').disabled = true;
 
-        // Clear previous
+        // Clear previous results
         document.getElementById('logArea').innerHTML = '';
         document.getElementById('resultsContainer').innerHTML = '';
         document.getElementById('progressWrap').classList.remove('active');
@@ -614,288 +751,403 @@
         var pdfUrl = buildCFETPPdfUrl(afsc);
         var epubsUrl = buildEpubsSearchUrl(afsc);
 
-        log('Constructed PDF URL: ' + pdfUrl, 'info');
-        log('e-Publishing search: ' + epubsUrl, 'info');
-        setProgress(30);
+        log('Direct PDF URL: ' + pdfUrl, 'info');
+        log('e-Publishing search URL: ' + epubsUrl, 'info');
+        setProgress(50);
 
-        // Attempt to verify the PDF link exists via fetch (HEAD request)
-        var pdfVerified = false;
-        var pdfAccessible = false;
-        try {
-            log('Verifying PDF link availability...', 'info');
-            var resp = await fetch(pdfUrl, { method: 'HEAD', mode: 'cors' });
-            if (resp.ok) {
-                pdfVerified = true;
-                pdfAccessible = true;
-                log('PDF link verified successfully! File exists on e-Publishing.', 'success');
-            } else {
-                log('PDF HEAD returned status ' + resp.status + '. File may not exist at this URL.', 'warn');
-                pdfVerified = true;
-                pdfAccessible = false;
-            }
-        } catch (e) {
-            log('Cannot verify link via CORS (expected for cross-origin). Will attempt direct access.', 'warn');
-            pdfVerified = false;
-            pdfAccessible = false;
-        }
-
-        setProgress(60);
-
-        // Build results
+        // Build results UI
         var resultsSection = document.getElementById('resultsSection');
         var resultsContainer = document.getElementById('resultsContainer');
         var resultTitle = document.getElementById('resultTitle');
         var resultBadge = document.getElementById('resultBadge');
 
-        resultTitle.textContent = '';
+        // Set title
+        resultTitle.innerHTML = '';
         var icon = document.createElement('i');
         icon.className = 'fas fa-file-alt';
         resultTitle.appendChild(icon);
         resultTitle.appendChild(document.createTextNode(' CFETP ' + afsc));
 
-        if (pdfAccessible) {
-            resultBadge.innerHTML = '<span class="badge badge-found">Link Verified</span>';
-            log('PDF link confirmed. Rendering download options for CFETP ' + afsc, 'success');
-        } else if (pdfVerified) {
-            resultBadge.innerHTML = '<span class="badge badge-notfound">Not Found</span>';
-            log('PDF not found at standard URL. Use e-Publishing search to locate the document.', 'warn');
-        } else {
-            resultBadge.innerHTML = '<span class="badge badge-notfound">Unverified</span>';
-            log('Could not verify link due to CORS. Download options available — try direct PDF first.', 'warn');
-        }
+        resultBadge.innerHTML = '<span class="badge badge-found">Ready</span>';
 
-        var productName = 'CFETP' + afsc;
-        var escapedAfsc = escapeHtml(afsc);
-        var escapedProduct = escapeHtml(productName);
-        var escapedEpubsUrl = escapeHtml(epubsUrl);
-
-        // Build result card safely
+        // Build result card using DOM methods (safe, no innerHTML with user data)
         var card = document.createElement('div');
         card.className = 'result-card';
 
         var titleDiv = document.createElement('div');
         titleDiv.className = 'title';
-        titleDiv.textContent = 'AFSC ' + afsc + ' — Career Field Education & Training Plan';
+        titleDiv.textContent = 'CFETP' + afsc + ' — Career Field Education & Training Plan';
         card.appendChild(titleDiv);
 
         var prodDiv = document.createElement('div');
         prodDiv.className = 'product-num';
-        prodDiv.textContent = productName;
+        prodDiv.textContent = 'Product Number: CFETP' + afsc;
         card.appendChild(prodDiv);
 
         var metaDiv = document.createElement('div');
         metaDiv.className = 'meta';
         metaDiv.textContent = 'Source: Department of the Air Force e-Publishing • ';
         var epubsLink = document.createElement('a');
-        epubsLink.href = epubsUrl;
-        epubsLink.target = '_blank';
-        epubsLink.rel = 'noopener noreferrer';
         epubsLink.className = 'epubs-link';
+        epubsLink.href = '#';
+        epubsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open(epubsUrl, '_blank', 'noopener,noreferrer');
+        });
         var linkIcon = document.createElement('i');
         linkIcon.className = 'fas fa-external-link-alt';
         epubsLink.appendChild(linkIcon);
-        epubsLink.appendChild(document.createTextNode(' View on e-Publishing'));
+        epubsLink.appendChild(document.createTextNode(' Search on e-Publishing'));
         metaDiv.appendChild(epubsLink);
         card.appendChild(metaDiv);
 
+        // Action buttons
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'result-actions';
 
-        // PDF Button
+        // PDF Button — direct download
         var pdfBtn = document.createElement('button');
         pdfBtn.className = 'btn btn-danger btn-sm';
         pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
-        pdfBtn.addEventListener('click', function() { downloadPDF(afsc); });
+        pdfBtn.title = 'Download PDF directly from e-Publishing';
+        pdfBtn.addEventListener('click', function() {
+            log('Opening direct PDF link for CFETP' + afsc, 'info');
+            window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+        });
         actionsDiv.appendChild(pdfBtn);
 
-        // RTF Button
+        // RTF Button — instructs user to upload
         var rtfBtn = document.createElement('button');
         rtfBtn.className = 'btn btn-warning btn-sm';
         rtfBtn.innerHTML = '<i class="fas fa-file-word"></i> RTF';
-        rtfBtn.addEventListener('click', function() { confirmConvert(afsc, 'rtf'); });
+        rtfBtn.title = 'Convert PDF to Rich Text Format';
+        rtfBtn.addEventListener('click', function() {
+            showConvertModal(afsc, 'rtf');
+        });
         actionsDiv.appendChild(rtfBtn);
 
-        // HTML Button
+        // HTML Button — instructs user to upload
         var htmlBtn = document.createElement('button');
         htmlBtn.className = 'btn btn-info btn-sm';
         htmlBtn.innerHTML = '<i class="fas fa-file-code"></i> HTML';
-        htmlBtn.addEventListener('click', function() { confirmConvert(afsc, 'html'); });
+        htmlBtn.title = 'Convert PDF to HTML file';
+        htmlBtn.addEventListener('click', function() {
+            showConvertModal(afsc, 'html');
+        });
         actionsDiv.appendChild(htmlBtn);
 
-        // Search e-Pubs Button
-        var searchBtn = document.createElement('button');
-        searchBtn.className = 'btn btn-primary btn-sm';
-        searchBtn.innerHTML = '<i class="fas fa-search"></i> Search e-Pubs';
-        searchBtn.addEventListener('click', function() {
+        // e-Pubs Search Button — opens e-Publishing with AFSC in search bar
+        var epubsBtn = document.createElement('button');
+        epubsBtn.className = 'btn btn-primary btn-sm';
+        epubsBtn.innerHTML = '<i class="fas fa-search"></i> e-Pubs Search';
+        epubsBtn.title = 'Search for this AFSC on e-Publishing';
+        epubsBtn.addEventListener('click', function() {
+            log('Opening e-Publishing search for: ' + afsc, 'info');
             window.open(epubsUrl, '_blank', 'noopener,noreferrer');
         });
-        actionsDiv.appendChild(searchBtn);
+        actionsDiv.appendChild(epubsBtn);
 
         card.appendChild(actionsDiv);
 
         resultsContainer.innerHTML = '';
         resultsContainer.appendChild(card);
         resultsSection.classList.add('active');
+
+        // Show upload section
+        document.getElementById('uploadSection').classList.add('active');
+
         setProgress(100);
-        log('Ready. Choose a download format.', 'success');
+        log('Ready. Use PDF for direct download, or download then upload below to convert to RTF/HTML.', 'success');
+        log('e-Pubs Search will open e-Publishing with "' + afsc + '" in the search bar.', 'info');
 
         document.getElementById('searchBtn').disabled = false;
     }
 
-    // ─── Direct PDF Download ───
-    function downloadPDF(afsc) {
-        var clean = sanitizeInput(afsc);
-        if (!clean) return;
-        var url = buildCFETPPdfUrl(clean);
-        log('Initiating PDF download for CFETP ' + clean, 'info');
-        window.open(url, '_blank', 'noopener,noreferrer');
-    }
-
-    // ─── Confirm Conversion Modal ───
-    var pendingConversion = null;
-
-    function confirmConvert(afsc, format) {
+    // ─── Show Convert Modal ───
+    function showConvertModal(afsc, format) {
         var clean = sanitizeInput(afsc);
         if (!clean) return;
         var validFormats = ['rtf', 'html'];
         if (validFormats.indexOf(format) === -1) return;
 
         var formatLabel = format.toUpperCase();
-        pendingConversion = { afsc: clean, format: format };
 
+        // Check if a file is already uploaded
+        if (uploadedPdfBuffer) {
+            // File already uploaded, convert directly
+            convertUploadedFile(format);
+            return;
+        }
+
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-info-circle"></i> Convert to ' + formatLabel;
         document.getElementById('modalMsg').textContent =
-            'Download CFETP ' + clean + ' PDF and convert it to ' + formatLabel + ' format?';
+            'To convert CFETP ' + clean + ' to ' + formatLabel + ':\n\n' +
+            '1. First click "Download PDF" to get the PDF file\n' +
+            '2. Then drag & drop the downloaded PDF into the upload area below\n' +
+            '3. Click "Convert to ' + formatLabel + '" to generate your file';
+
         document.getElementById('confirmModal').classList.add('active');
 
         document.getElementById('modalConfirm').onclick = function() {
             closeModal();
-            if (pendingConversion) {
-                convertPDF(pendingConversion.afsc, pendingConversion.format);
-            }
+            // Open the PDF for download
+            var pdfUrl = buildCFETPPdfUrl(clean);
+            window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+            log('PDF download opened. Upload the file below to convert to ' + formatLabel + '.', 'info');
+            // Scroll to upload section
+            setTimeout(function() {
+                document.getElementById('uploadSection').scrollIntoView({ behavior: 'smooth' });
+            }, 300);
         };
     }
 
     function closeModal() {
         document.getElementById('confirmModal').classList.remove('active');
-        pendingConversion = null;
+    }
+
+    // ─── File Upload Handling ───
+    function setupUpload() {
+        var uploadArea = document.getElementById('uploadArea');
+        var fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+    }
+
+    function handleFile(file) {
+        if (!file) return;
+
+        // Validate file type
+        var validExt = file.name.toLowerCase().endsWith('.pdf');
+        if (!validExt && file.type !== 'application/pdf') {
+            log('Error: Only PDF files are accepted. Got: ' + (file.type || 'unknown'), 'error');
+            alert('Please upload a PDF file only.');
+            return;
+        }
+
+        // Validate file size (max 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+            log('Error: File too large. Maximum 100MB.', 'error');
+            alert('File is too large. Maximum size is 100MB.');
+            return;
+        }
+
+        if (file.size < 100) {
+            log('Error: File too small to be a valid PDF.', 'error');
+            alert('File is too small to be a valid PDF.');
+            return;
+        }
+
+        var fileSizeKB = (file.size / 1024).toFixed(1);
+        log('File selected: ' + file.name + ' (' + fileSizeKB + ' KB)', 'info');
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var arrayBuffer = e.target.result;
+
+            // Validate PDF magic bytes (%PDF-)
+            var header = new Uint8Array(arrayBuffer.slice(0, 5));
+            var magic = String.fromCharCode(header[0], header[1], header[2], header[3], header[4]);
+            if (magic !== '%PDF-') {
+                log('Error: File does not have valid PDF header (%PDF-). Not a real PDF.', 'error');
+                alert('This file does not appear to be a valid PDF.');
+                return;
+            }
+
+            uploadedPdfBuffer = arrayBuffer;
+            log('PDF loaded and validated (' + fileSizeKB + ' KB). Ready for conversion.', 'success');
+
+            // Show upload actions with filename
+            var nameSpan = document.getElementById('uploadedFileName');
+            nameSpan.innerHTML = '';
+            var checkIcon = document.createElement('i');
+            checkIcon.className = 'fas fa-check-circle';
+            checkIcon.style.color = '#28a745';
+            nameSpan.appendChild(checkIcon);
+            nameSpan.appendChild(document.createTextNode(' ' + file.name));
+
+            document.getElementById('uploadActions').style.display = 'flex';
+        };
+
+        reader.onerror = function() {
+            log('Error reading file.', 'error');
+            alert('Error reading the file. Please try again.');
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    function clearUpload() {
+        uploadedPdfBuffer = null;
+        document.getElementById('fileInput').value = '';
+        document.getElementById('uploadActions').style.display = 'none';
+        log('Upload cleared.', 'info');
+    }
+
+    // ─── Convert Uploaded File ───
+    async function convertUploadedFile(format) {
+        var validFormats = ['rtf', 'html'];
+        if (validFormats.indexOf(format) === -1) {
+            log('Error: Invalid format "' + format + '".', 'error');
+            return;
+        }
+
+        if (!uploadedPdfBuffer) {
+            alert('Please upload a PDF file first. Download the PDF using the PDF button, then drag & drop it into the upload area.');
+            return;
+        }
+
+        var afsc = currentAfsc || 'UNKNOWN';
+        var formatLabel = format.toUpperCase();
+
+        log('Starting ' + formatLabel + ' conversion...', 'info');
+        setProgress(5);
+
+        try {
+            // Extract text from PDF using PDF.js
+            var pages = await extractTextFromPDF(uploadedPdfBuffer);
+
+            if (!pages || pages.length === 0) {
+                throw new Error('No pages could be extracted from the PDF.');
+            }
+
+            // Count total characters
+            var totalChars = 0;
+            for (var p = 0; p < pages.length; p++) {
+                totalChars += pages[p].text.length;
+            }
+
+            log('Extracted ' + totalChars + ' characters from ' + pages.length + ' pages.', 'info');
+
+            if (totalChars < 10) {
+                log('Warning: Very little text extracted. The PDF may be image-based (scanned). OCR is not supported in the browser.', 'warn');
+            }
+
+            setProgress(85);
+
+            // Generate output file
+            if (format === 'rtf') {
+                buildAndDownloadRTF(pages, afsc);
+            } else if (format === 'html') {
+                buildAndDownloadHTML(pages, afsc);
+            }
+
+            setProgress(100);
+            log(formatLabel + ' conversion complete! File download initiated.', 'success');
+
+        } catch (err) {
+            log('Conversion error: ' + (err.message || err), 'error');
+            setProgress(0);
+            alert('Conversion failed: ' + (err.message || 'Unknown error') + '\n\nTry opening the e-Publishing search to find the document manually.');
+        }
     }
 
     // ─── PDF Text Extraction with PDF.js ───
     async function extractTextFromPDF(arrayBuffer) {
-        var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        log('Loading PDF with PDF.js...', 'info');
+        setProgress(10);
+
+        var loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+        var pdf = await loadingTask.promise;
         var totalPages = pdf.numPages;
-        log('PDF has ' + totalPages + ' pages. Extracting text...', 'info');
+
+        log('PDF loaded: ' + totalPages + ' pages. Extracting text...', 'info');
 
         var pages = [];
 
         for (var i = 1; i <= totalPages; i++) {
             var page = await pdf.getPage(i);
             var textContent = await page.getTextContent();
-            var textItems = textContent.items;
+            var items = textContent.items;
+
+            // Build text with line break detection based on Y-coordinate changes
             var lines = [];
+            var currentLine = '';
             var lastY = null;
 
-            for (var j = 0; j < textItems.length; j++) {
-                var item = textItems[j];
-                var y = item.transform[5];
-                if (lastY !== null && Math.abs(y - lastY) > 5) {
-                    lines.push('\n');
+            for (var j = 0; j < items.length; j++) {
+                var item = items[j];
+                if (typeof item.str !== 'string') continue;
+
+                var y = (item.transform && item.transform.length >= 6) ? item.transform[5] : null;
+
+                // If Y coordinate changed significantly, it's a new line
+                if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) {
+                    if (currentLine.trim()) {
+                        lines.push(currentLine.trim());
+                    }
+                    currentLine = item.str;
+                } else {
+                    // Same line — add space if needed
+                    if (currentLine && item.str && !currentLine.endsWith(' ') && !item.str.startsWith(' ')) {
+                        // Check if there's a gap (hasEOL or space between items)
+                        if (item.hasEOL) {
+                            if (currentLine.trim()) {
+                                lines.push(currentLine.trim());
+                            }
+                            currentLine = item.str;
+                        } else {
+                            currentLine += item.str;
+                        }
+                    } else {
+                        currentLine += item.str;
+                    }
                 }
-                lines.push(item.str);
-                lastY = y;
+
+                if (y !== null) lastY = y;
             }
 
-            var pageText = lines.join(' ').replace(/ \n /g, '\n').replace(/  +/g, ' ').trim();
+            // Push last line
+            if (currentLine.trim()) {
+                lines.push(currentLine.trim());
+            }
+
+            var pageText = lines.join('\n').replace(/\n{4,}/g, '\n\n\n').trim();
 
             pages.push({
                 pageNum: i,
                 text: pageText
             });
 
-            setProgress(40 + Math.round((i / totalPages) * 40));
-            log('Extracted page ' + i + ' of ' + totalPages, 'info');
+            // Update progress
+            var pct = 15 + Math.round((i / totalPages) * 65);
+            setProgress(pct);
+
+            // Log every 10 pages or on last page
+            if (i % 10 === 0 || i === totalPages) {
+                log('Extracted page ' + i + ' of ' + totalPages, 'info');
+            }
         }
 
         return pages;
-    }
-
-    // ─── PDF Conversion Engine ───
-    async function convertPDF(afsc, format) {
-        var clean = sanitizeInput(afsc);
-        if (!clean) return;
-        var validFormats = ['rtf', 'html'];
-        if (validFormats.indexOf(format) === -1) return;
-
-        var url = buildCFETPPdfUrl(clean);
-
-        log('Fetching PDF for conversion to ' + format.toUpperCase() + '...', 'info');
-        setProgress(10);
-
-        try {
-            var response = await fetch(url, { mode: 'cors' });
-
-            if (!response.ok) {
-                throw new Error('HTTP ' + response.status + ': Unable to fetch PDF. The file may not exist at the standard URL.');
-            }
-
-            var contentType = response.headers.get('content-type');
-            if (contentType && contentType.indexOf('pdf') === -1 && contentType.indexOf('octet-stream') === -1) {
-                log('Warning: Response content-type is "' + contentType + '", expected PDF.', 'warn');
-            }
-
-            var arrayBuffer = await response.arrayBuffer();
-
-            if (arrayBuffer.byteLength < 100) {
-                throw new Error('Response too small to be a valid PDF (' + arrayBuffer.byteLength + ' bytes).');
-            }
-
-            // Validate PDF magic bytes
-            var header = new Uint8Array(arrayBuffer.slice(0, 5));
-            var pdfMagic = String.fromCharCode.apply(null, header);
-            if (pdfMagic !== '%PDF-') {
-                throw new Error('Downloaded file is not a valid PDF. The URL may have returned an error page.');
-            }
-
-            log('PDF downloaded (' + (arrayBuffer.byteLength / 1024).toFixed(1) + ' KB). Parsing with PDF.js...', 'info');
-            setProgress(30);
-
-            var pages = await extractTextFromPDF(arrayBuffer);
-
-            if (pages.length === 0) {
-                throw new Error('No pages extracted from PDF.');
-            }
-
-            var totalChars = 0;
-            for (var p = 0; p < pages.length; p++) {
-                totalChars += pages[p].text.length;
-            }
-
-            if (totalChars < 10) {
-                log('Warning: Very little text extracted. PDF may be image-based (scanned). OCR is not supported in browser.', 'warn');
-            }
-
-            log('Text extraction complete (' + totalChars + ' characters). Building ' + format.toUpperCase() + ' file...', 'info');
-            setProgress(85);
-
-            if (format === 'rtf') {
-                buildAndDownloadRTF(pages, clean);
-            } else if (format === 'html') {
-                buildAndDownloadHTML(pages, clean);
-            }
-
-            setProgress(100);
-            log(format.toUpperCase() + ' file generated and download initiated!', 'success');
-
-        } catch (err) {
-            log('Error: ' + err.message, 'error');
-            log('Tip: Use the "Search e-Pubs" button to find the document manually on e-Publishing.', 'warn');
-            setProgress(0);
-
-            // Offer fallback
-            var epubsUrl = buildEpubsSearchUrl(clean);
-            log('Fallback: Opening e-Publishing search...', 'info');
-            window.open(epubsUrl, '_blank', 'noopener,noreferrer');
-        }
     }
 
     // ─── RTF Escape ───
@@ -920,34 +1172,45 @@
         return result;
     }
 
-    // ─── Build RTF ───
+    // ─── Build & Download RTF ───
     function buildAndDownloadRTF(pages, afsc) {
         var clean = sanitizeInput(afsc);
+        var dateStr = new Date().toLocaleString();
+
         var rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\n';
         rtf += '{\\fonttbl{\\f0\\fswiss\\fcharset0 Calibri;}{\\f1\\fmodern\\fcharset0 Courier New;}}\n';
-        rtf += '{\\colortbl ;\\red0\\green51\\blue102;\\red0\\green0\\blue0;\\red128\\green128\\blue128;}\n';
+        rtf += '{\\colortbl ;\\red26\\green58\\blue92;\\red0\\green0\\blue0;\\red136\\green136\\blue136;\\red240\\green180\\blue0;}\n';
         rtf += '\\viewkind4\\uc1\n';
 
         // Title page
-        rtf += '\\pard\\qc\\f0\\fs36\\cf1\\b CFETP ' + escapeRtf(clean) + '\\b0\\par\n';
-        rtf += '\\fs24\\cf3 Career Field Education & Training Plan\\par\n';
-        rtf += '\\fs20 Department of the Air Force e-Publishing\\par\n';
-        rtf += '\\fs18 Converted: ' + escapeRtf(new Date().toLocaleString()) + '\\par\n';
+        rtf += '\\pard\\qc\\f0\\fs40\\cf1\\b CFETP ' + escapeRtf(clean) + '\\b0\\par\n';
+        rtf += '\\fs28\\cf4 Career Field Education & Training Plan\\par\n';
+        rtf += '\\fs22\\cf3 Department of the Air Force e-Publishing\\par\n';
+        rtf += '\\fs20\\cf3 Converted: ' + escapeRtf(dateStr) + '\\par\n';
+        rtf += '\\fs18\\cf3
+
+Source: static.e-publishing.af.mil\\par\n';
         rtf += '\\pard\\par\\par\n';
         rtf += '\\page\n';
 
-        // Pages
+        // Content pages
         for (var i = 0; i < pages.length; i++) {
             var p = pages[i];
-            rtf += '\\pard\\f0\\fs22\\cf1\\b\\ul Page ' + p.pageNum + '\\ulnone\\b0\\par\n';
-            rtf += '\\pard\\cf2\\fs20 ';
 
+            // Page header
+            rtf += '\\pard\\f0\\fs24\\cf1\\b Page ' + p.pageNum + ' of ' + pages.length + '\\b0\\par\n';
+            rtf += '\\pard\\brdrb\\brdrs\\brdrw10\\brsp20\\par\n';
+
+            // Page content
+            rtf += '\\pard\\cf2\\f0\\fs20 ';
             var lines = p.text.split('\n');
             for (var j = 0; j < lines.length; j++) {
                 rtf += escapeRtf(lines[j]) + '\\par\n';
             }
 
             rtf += '\\par\n';
+
+            // Page break (except last page)
             if (i < pages.length - 1) {
                 rtf += '\\page\n';
             }
@@ -958,10 +1221,10 @@
         var blob = new Blob([rtf], { type: 'application/rtf' });
         var filename = 'CFETP_' + sanitizeFilename(clean) + '.rtf';
         triggerDownload(blob, filename);
-        log('RTF file "' + filename + '" ready for download.', 'success');
+        log('RTF file "' + filename + '" generated (' + (blob.size / 1024).toFixed(1) + ' KB).', 'success');
     }
 
-    // ─── Build HTML ───
+    // ─── Build & Download HTML ───
     function buildAndDownloadHTML(pages, afsc) {
         var clean = sanitizeInput(afsc);
         var escapedClean = escapeHtml(clean);
@@ -972,44 +1235,56 @@
         html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
         html += '<title>CFETP ' + escapedClean + '</title>\n';
         html += '<style>\n';
+        html += '* { margin: 0; padding: 0; box-sizing: border-box; }\n';
         html += 'body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f5f5f5; color: #222; }\n';
-        html += 'h1 { color: #1a3a5c; border-bottom: 3px solid #f0b400; padding-bottom: 10px; margin-bottom: 5px; }\n';
-        html += '.meta { color: #666; font-size: 0.85rem; margin-bottom: 30px; }\n';
+        html += '.doc-header { background: #1a3a5c; color: #f0b400; padding: 25px; border-radius: 10px 10px 0 0; text-align: center; margin-bottom: 0; }\n';
+        html += '.doc-header h1 { font-size: 1.6rem; margin-bottom: 5px; }\n';
+        html += '.doc-header p { color: #8899aa; font-size: 0.85rem; }\n';
+        html += '.doc-meta { background: #1b2838; color: #8899aa; padding: 12px 25px; font-size: 0.8rem; border-bottom: 3px solid #f0b400; margin-bottom: 20px; border-radius: 0 0 10px 10px; }\n';
         html += '.page { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }\n';
-        html += '.page h2 { color: #1a3a5c; font-size: 1rem; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 15px; }\n';
-        html += '.page-content { white-space: pre-wrap; word-wrap: break-word; font-family: "Segoe UI", Tahoma, sans-serif; font-size: 0.9rem; line-height: 1.7; }\n';
-        html += '.footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }\n';
-        html += '@media print { .page { break-inside: avoid; box-shadow: none; } body { background: #fff; } }\n';
+        html += '.page h2 { color: #1a3a5c; font-size: 1rem; border-bottom: 2px solid #f0b400; padding-bottom: 8px; margin-bottom: 15px; }\n';
+        html += '.page-content { white-space: pre-wrap; word-wrap: break-word; font-size: 0.9rem; line-height: 1.7; color: #333; }\n';
+        html += '.footer { text-align: center; color: #999; font-size: 0.75rem; margin-top: 40px; padding: 20px; border-top: 1px solid #ddd; }\n';
+        html += '@media print { .page { break-inside: avoid; box-shadow: none; } body { background: #fff; } .doc-header, .doc-meta { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }\n';
         html += '</style>\n</head>\n<body>\n';
-        html += '<h1>CFETP ' + escapedClean + '</h1>\n';
-        html += '<div class="meta">Career Field Education & Training Plan • Source: AF e-Publishing • Converted: ' + escapedDate + '</div>\n';
 
+        // Header
+        html += '<div class="doc-header">\n';
+        html += '<h1>CFETP ' + escapedClean + '</h1>\n';
+        html += '<p>Career Field Education & Training Plan</p>\n';
+        html += '</div>\n';
+        html += '<div class="doc-meta">Source: Department of the Air Force e-Publishing • Converted: ' + escapedDate + ' • Pages: ' + pages.length + '</div>\n';
+
+        // Pages
         for (var i = 0; i < pages.length; i++) {
             var p = pages[i];
             html += '<div class="page">\n';
-            html += '<h2>Page ' + p.pageNum + '</h2>\n';
+            html += '<h2>Page ' + p.pageNum + ' of ' + pages.length + '</h2>\n';
             html += '<div class="page-content">' + escapeHtml(p.text) + '</div>\n';
             html += '</div>\n';
         }
 
+        // Footer
         html += '<div class="footer">Generated by AFSC CFETP Download Hub • ' + escapedDate + '</div>\n';
         html += '</body>\n</html>';
 
         var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
         var filename = 'CFETP_' + sanitizeFilename(clean) + '.html';
         triggerDownload(blob, filename);
-        log('HTML file "' + filename + '" ready for download.', 'success');
+        log('HTML file "' + filename + '" generated (' + (blob.size / 1024).toFixed(1) + ' KB).', 'success');
     }
 
     // ─── Download Trigger ───
     function triggerDownload(blob, filename) {
-        var safeName = sanitizeFilename(filename.replace(/\.[^.]+$/, ''));
-        var ext = filename.split('.').pop().toLowerCase();
+        // Extract and validate extension
+        var parts = filename.split('.');
+        var ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+        var baseName = sanitizeFilename(parts.join(''));
         var allowedExt = ['pdf', 'rtf', 'html'];
         if (allowedExt.indexOf(ext) === -1) {
             ext = 'txt';
         }
-        var finalName = safeName + '.' + ext;
+        var finalName = baseName + '.' + ext;
 
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
@@ -1030,14 +1305,14 @@
         }
     });
 
-    // ─── Close modal on Escape key ───
+    // Close modal on Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeModal();
         }
     });
 
-    // ─── Close modal on overlay click ───
+    // Close modal on overlay click
     document.getElementById('confirmModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeModal();
@@ -1046,6 +1321,7 @@
 
     // ─── Init ───
     buildGrid();
+    setupUpload();
 </script>
 
 </body>
